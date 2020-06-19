@@ -1,0 +1,55 @@
+---
+title: "Cultural Dimension"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+```
+
+# Cultural Dimension
+
+Ellis and Stimson (2012) find what they call the "economic" and "cultural dimensions" of public policy preferences to have a statistically negligable difference.
+**Use Cramer's work to justify why looking at cultural**
+
+## Criterion variables for interpreting the cultural dimension
+
+* Capital punishment
+* Homosexual marriage
+* Immigration
+* Homosexual job rights
+* Birth control 
+* Privacy
+
+**add in vaccines, just because it's interesting**
+
+```{r}
+cultural2016 <- anes2016recode %>%
+  select(c(
+    caseid,
+    libcon, # POLITICAL ID (FORCED): 6 = STRONG CONSERVATIVE ... 0 = STRONG LIBERAL
+    partyid, # PARTISAN ID: 6 = STRONG REP ... 0 = STRONG DEM
+    immpolicy, # 3 = REMAIN NO PENALTY, 2 = REMAIN PENALTY, 1 = GUEST WORKER, 0 = DEPORT
+    immnopenalty, # 1 = REMAIN IN US WITHOUT PENALTY, 0 = OTHERWISE
+    immpenalty, # 1 = REMAIN IN US BUT WITH PENALTY, 0 = OTHERWISE
+    immguest, # 1 = REMAIN IN US GUEST WORKER PROGRAM, 0 = OTHERWISE
+    immdeport, # 1 = ILLEGAL IMMIGRANTS CLASSIFIED AS FELONS AND DEPORTED, 0 = OTHERWISE
+    immbirth, # 6 = R SUPPORTS BIRTHRIGHT CITIZENSHIP ... 0 = R SUPPORTS BIRTHPLACE CITIZENS
+    immcitizen, # 5 = R SUPPORTS SENDING IMMIGRANT CHILDREN BACK ... 0 = ALLOWED TO STAY
+    aacolleges, # 6 = R SUPPORTS AFFIRMATIVE ACTION IN COLLEGES ... 0 = R OPPOSES
+    glservice, # 5 = REQUIRE SERVICE FOR GAY COUPLES ... 0 = REFUSE SERVICE
+    transbath, # 5 = TRANS USE BATHROOM OF CHOICE ... 0 = USE BATHROOM OF GENDER BORN WITH
+    gaydiscrim, # 3 = STRONGLY FAVOR ANTIDISCRIMINATION LAWS ... 0 = STRONGLY OPPOSE
+    gayadopt, # 1 = GAYS AND LESBIANS SHOULD BE ABLE TO ADOPT CHILDREN, 0 = SHOULD NOT
+    abortion, # 3 = ALL CIRCUMSTANCE, 2 = MANY REASONS, 1 = RAPE, ETC., 0 = NEVER
+    dpenalty, # 3 = STRONGLY SUPPORTS DEATH PENALTY ... 0 = STRONGLY OPPOSES
+    vaccines, # 6 = STRONGLY SUPPORTS VACCINES IN SCHOOLS ... 0 = STRONGLY OPPOSE
+    pubsecurity, # 2 = CHANGES IN SECURITY GONE TOO FAR, 1 = ABOUT RIGHT, 0 = NOT FAR ENOUGH
+    immlevel, # 4 = IMMIGRATION SHOULD BE INCREASED A LOT ... 0 = DECREASED A LOT
+    benriskvaccines, # 6 = BENEFITS MUCH GREATER FOR VACCINES ... 0 = RISK MUCH GREATER
+    govwiretaps, # 2 = GOV WIRETAPS GONE TOO FAR, 1 = ABOUT RIGHT, 0 = NOT FAR ENOUGH
+    gaymarriage, # 1 = GAYS AND LESBIANS CAN MARRY, 0 = CIVIL UNIONS, -1 = NO LEGAL RECOG
+  ))
+```
+

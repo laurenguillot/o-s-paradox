@@ -1,0 +1,302 @@
+---
+title: "Economic Dimension"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(knitr)
+```
+
+# Economic Dimension (Ellis & Stimson 2012)
+
+Quote from p. 42:
+> The conventional definitions of liberal and conservative, which have defined ideological conflict since the New Deal era, focus on three closely related sets of policy issues. These are:
+
+>   1. Size and scope of government: The liberal position is that govern- ment should deal with various problems in the society and econ- omy, which generally implies a bigger government that does more and taxes more to pay for it. Doing more often entails interfering in the private economy to change its outcomes both by regulation and by distributing of benefits (see later discussion). The conserva- tive position is that free markets are superior and that government should do less and tax less.
+
+>   2. The welfare state: The liberal position is that government should operate a social safety net that provides the social insurance benefits that the private economy does not provide. These are pensions, health care, public education, unemployment compensation, and the like. Conservatives support some aspects of the social safety net, oppose others, and are generally opposed to expansions of the public role.
+
+>   3. Labor versus management: In this issue, which is less prominent in recent decades than in the aftermath of the New Deal, liberals gen- erally support the labor union movement and measures that would expand its reach while conservative usually side with management and support restrictions on union activities.
+
+## Criterion variables for interpreting economic dimension (Ellis & Stimson 2012, Appendix 3.4)
+
+* Gun contol
+* Taxes
+* Health insurance
+* Education 
+* Environment
+* Welfare
+* Housing
+* Equal opportunity
+* Government services and spending
+* Employment
+* Race
+
+Keeping in line with Ellis and Stimson (2012), I identified questions that fell within what they defined as the economic dimension of policy preferences [**need to put in a definition here**]. I selected 20 questions with balanced phrasing, that is, that they proposed two equally persuasive sides of an issue and allowed the respondent to select which one they approved of. 
+
+```{r var}
+econ2016 <- anes2016recode %>%
+  select(c(
+    caseid,
+    stfips, # STATE FIPS CODE
+    stabbrev, # STATE ABBREVIATION
+    congdist, # CONGRESSIONAL DISTRICT NUMBER
+    libcon, # POLITICAL ID (FORCED): 6 = STRONG CONSERVATIVE ... 0 = STRONG LIBERAL
+    partyid, # PARTISAN ID: 6 = STRONG REP ... 0 = STRONG DEM
+    educ, # 1 = LESS THAN HIGH SCHOOL ... 8 = DOCTORATE OR PROFESSIONAL
+    race, # 1 = WHITE, 2 = BLACK, 3 = ASIAN, 4 = NATIVE, 5 = HISPANIC, 6 = OTHER
+    hispanic, # 1 = R IS HISPANIC, 0 = OTHERWISE
+    white, # 1 = R IS WHITE NON-HISPANIC, 0 = OTHERWISE
+    white1, # 1 = R IS WHITE (INCLUDING HISPANIC WHITES), 0 = OTHERWISE
+    black, # 1 = R IS BLACK NON-HISPANIC, 0 = OTHERWISE
+    asian, # 1 = R IS ASIAN NON-HISPANIC, 0 = OTHERWISE
+    natamer, # 1 = R IS NATIVE AMERICAN NON-HISPANIC, 0 = OTHERWISE
+    otherrace, # 1 = R IS OTHER OR MIXED RACE, 0 = OTHERWISE
+    gender, # 1 = R IS A WOMAN, 0 = MAN
+    govservice, # GOV SERVICES SCALE: 6 = GOV SHOULD PROVIDE MORE SERVICES
+    medinsur, # MEDICAL INSURANCE SCALE: 6 = GOV INSUANCE ... 0 = PRIVATE INSURANCE
+    fedgun, # 2 = GUN PURCHASE EASIER, 1 = THE SAME, 0 = GUN PURCHASE MORE DIFFICULT
+    govjob, # GOV JOB SCALE: 6 = GOV GUARANTEES JOBS ... 0 = GET JOBS ON OWN
+    govblacks, # AID TO BLACKS SCALE: 6 = GOV SHOULD HELP BLACKS ... 0 = BLACKS HELP SELVES
+    ssocsec, # 1 = INCREASED SPENDING ON SOCSEC, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sschools, # 1 = INCREASED SPENDING ON SCHOOLS, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sscience, # 1 = INCREASED SPENDING ON SCIENCE, 0 = KEEP SAME, -1 DECREASED SPENDING
+    swelfare, # 1 = INCREASED SPENDING ON WELFARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    schildcare, # 1 = INCREASED SPEND ON CHILD CARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    spoor, # 1 = INCREASED SPEND ON POOR, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    senviron, # 1 = INCREASED SPEND ON ENVIRONMENT, 0 = KEEP SAME, -1 = DECREASED,
+    gwaction, # 6 = GOV SHOULD BE DOING GREAT DEAL MORE FOR GLOBAL WARMING ... 0 = LESS
+    govinequality, # 2 = R SUPPORT GOV EFFORTS TO REDUCE INEQUALITY, 1 = NEUTRAL, 0 = OPPOSE
+    shealthcare7, # 6 = SUPPORT STRONG INCREASE IN HEALTH CARE SPEND, 0 = STRONG DECREASE
+    taxmillion, # 2 = SUPPORTS INCREASING TAXES ON MILLIONAIRES, 1 = NEUTRAL, 0 = OPPOSE
+    govprob, # 1 = GOV DOING TOO MUCH, 0 = PROBLEMS ARE BIGGER
+    fmarket, # 1 = FREE MARKET CAN HANDLE PROBLEMS, 0 = GOV NEEDED TO SOLVE PROBLEMS
+    govless, # 1 = LESS GOV THE BETTER, 0 = GOV SHOULD DO MORE THINGS
+    gregbus, # 4 = A GREAT DEAL OF REGULATION IS GOOD FOR SOCIETY ... 0 = NONE AT ALL
+  ))
+
+```
+
+Check if variables have enough complete responses.
+
+```{r}
+# econ2016 has 4271 observations
+sum(is.na(econ2016$libcon)) # 63 missing
+sum(is.na(econ2016$partyid)) # 23 missing
+sum(is.na(econ2016$govservice)) # 643 missing
+sum(is.na(econ2016$medinsur)) # 505 missing
+sum(is.na(econ2016$fedgun)) # 24 missing
+sum(is.na(econ2016$govjob)) # 497 missing
+sum(is.na(econ2016$govblacks)) #517 missing
+sum(is.na(econ2016$ssocsec)) #31 missing
+sum(is.na(econ2016$sschools)) #23 missing
+sum(is.na(econ2016$sscience)) # 29 missing
+sum(is.na(econ2016$swelfare)) # 42 missing
+sum(is.na(econ2016$schildcare)) # 49 missing
+sum(is.na(econ2016$spoor)) # 43 missing
+sum(is.na(econ2016$senviron)) # 31 missing
+sum(is.na(econ2016$govinequality)) # 654 missing
+sum(is.na(econ2016$shealthcare7)) # 675 missing
+sum(is.na(econ2016$taxmillion)) # 635 missing
+sum(is.na(econ2016$govprob)) # 654 missing
+sum(is.na(econ2016$fmarket)) # 652 missing
+sum(is.na(econ2016$govless)) # 650 missing
+sum(is.na(econ2016$gregbus)) # 643 missing
+```
+
+Remove rows containing NA values -- make sure you still have enough observations
+*could also use just pre data to have more observations*
+
+```{r}
+econ2016recode <- na.omit(econ2016) # removes 1778 observations, leaving 2493
+```
+
+I reverse coded items so higher values indicate more liberal issue positions. 
+
+```{r}
+#econ2016recode <- econ2016recode %>%
+econ2016recode <- econ2016 %>%
+  mutate(libcon = recode(libcon, #recode so 6 = strong liberal and 0 = strong conservative
+                         `0` = 6,
+                         `1` = 5,
+                         `2` = 4, 
+                         `4` = 2,
+                         `5` = 1, 
+                         `6` = 0
+                          )) %>%
+  mutate(partyid = recode(partyid, #recode so 6 = strong Democrat and 0 = strong Republican
+                          `0` = 6,
+                          `1` = 5,
+                          `2` = 4, 
+                          `4` = 2,
+                          `5` = 1, 
+                          `6` = 0
+                          )) # %>%
+ # mutate(fedgun = recode(fedgun, #recode so 2 = gun purchase more difficult and 0 = gun purchase more easy
+   #                      `0` = 2,
+  #                       `2` = 0
+  #                       )) %>%
+#  mutate(ssocsec = recode(ssocsec, #recode so 2 = more spending, 1 = stay the same, 0 = decrease spending
+  #                        `1` = 2,
+  #                        `0` = 1,
+  #                        `-1` = 0
+  #                        )) %>%
+ # mutate(sschools = recode(sschools, #reverse code so 2 = increased spending, 1 = stay the same, 0 = decrease
+  #                         `1` = 2,
+  #                         `0` = 1,
+  #                         `-1` = 0
+  #                         )) %>%
+#  mutate(sscience = recode(sscience, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+         #                  `1` = 2,
+          #                 `0` = 1,
+           #                `-1` = 0
+            #               )) %>%
+#  mutate(swelfare = recode(swelfare, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+            #               `1` = 2,
+            #               `0` = 1,
+            #               `-1` = 0
+             #              )) %>%
+ # mutate(schildcare = recode(schildcare, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+             #              `1` = 2,
+            #               `0` = 1,
+            #               `-1` = 0
+             #              )) %>%
+#  mutate(spoor = recode(spoor, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+              #             `1` = 2,
+              #             `0` = 1,
+              #             `-1` = 0
+              #             )) %>%
+#  mutate(senviron = recode(senviron, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+               #            `1` = 2,
+              #             `0` = 1,
+              #             `-1` = 0
+              #             )) %>%
+ # mutate(govprob = recode(govprob, #reverse code 1 = problems are bigger, 0 = gov doing too much
+#                          `1` = 0,
+#                          `0` = 1
+#                          )) %>%
+#  mutate(fmarket = recode(fmarket, #reverse code 1 = gov needed to solve problems, 0 = free market can handle
+#                          `1` = 0,
+#                          `0` = 1
+#                          )) %>%
+#  mutate(govless = recode(govless, #reverse code 1 = gov should do more things, 0 = less gov the better
+#                          `1` = 0,
+#                          `0` = 1
+#                          ))
+  
+```
+
+#Additive Score: 1 for liberal response, 0 for moderate response, -1 for conservative response
+```{r}
+econ2016additive <- econ2016recode
+
+econ2016additive <- econ2016additive %>%
+  mutate(govservice1 = recode(govservice,
+                              `6` = 1,
+                              `5` = 1,
+                              `4` = 1,
+                              `3` = 0, 
+                              `2` = -1,
+                              `1` = -1, 
+                              `0` = -1
+                              )) %>%
+  mutate(medinsur1 = recode(medinsur,
+                            `6` = 1,
+                            `5` = 1,
+                            `4` = 1,
+                            `3` = 0, 
+                            `2` = -1,
+                            `1` = -1, 
+                            `0` = -1
+                            )) %>%
+  mutate(govjob1 = recode(govjob,
+                          `6` = 1,
+                          `5` = 1,
+                          `4` = 1,
+                          `3` = 0, 
+                          `2` = -1,
+                          `1` = -1, 
+                          `0` = -1))
+
+# create additive scale
+econ2016additive <- econ2016additive %>%
+  mutate(fecon2016 = 
+           govservice1 + 
+           medinsur1 + 
+           govjob1 + 
+           ssocsec +
+           sschools +
+           sscience +
+           swelfare +
+           schildcare +
+           spoor +
+           senviron
+  )
+
+hist(econ2016additive$fecon2016)
+```
+
+
+
+#Factor score: Divide each column by the number of questions to give a value between 0 and 1 (greater numbers meaning more liberal answers)
+```{r}
+#econ2016recode <- econ2016recode %>%
+  mutate(govservice1 = govservice / 6) %>%
+  mutate(medinsur1 = medinsur / 6) %>%
+  mutate(fedgun1 = fedgun / 2) %>%
+  mutate(govjob1 = govjob / 6) %>%
+  mutate(govblacks1 = govblacks / 6) %>%
+  mutate(ssocsec1 = ssocsec / 2) %>%
+  mutate(sschools1 = sschools / 2) %>%
+  mutate(sscience1 = sscience / 2) %>%
+  mutate(swelfare1 = swelfare / 2) %>%
+  mutate(schildcare1 = schildcare / 2) %>%
+  mutate(spoor1 = spoor / 2) %>%
+  mutate(senviron1 = senviron / 2) %>%
+  mutate(gwaction1 = gwaction / 6) %>%
+  mutate(govinequality1 = govinequality / 2) %>%
+  mutate(shealthcare71 = shealthcare7 / 6) %>%
+  mutate(taxmillion1 = taxmillion / 2) %>%
+  mutate(govprob1 = govprob / 1) %>%
+  mutate(fmarket1 = fmarket / 1) %>%
+  mutate(govless1 = govless / 1) %>%
+  mutate(gregbus1 = gregbus / 4)
+```
+
+Create factor score for all economic dimension questions
+
+
+```{r}
+econ2016recode <- econ2016recode %>%
+  mutate(fecon2016 = 
+           govservice1 + 
+           medinsur1 + 
+          # fedgun1 + 
+           govjob1 + 
+          # govblacks1 +
+           ssocsec1 +
+           sschools1 +
+           sscience1 +
+           swelfare1 +
+           schildcare1 +
+           spoor1 +
+           senviron1 # +
+          # gwaction1 +
+          # govinequality1 +
+          # shealthcare71 +
+          # taxmillion1 +
+          # govprob1 +
+          # fmarket1 +
+          # govless1 +
+         #  gregbus1
+           )
+```
+
+
+Check distribution
+```{r}
+hist(econ2016recode$fecon2016)
+```
+

@@ -1,0 +1,34 @@
+---
+title: "ANES_CL_Combine"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(stringr)
+```
+
+## Combine ANES and City Lab DATA
+
+Make two vectors for state and congressional district in city lab data like in ANES data
+
+```{r}
+citylab_re <- citylab_re %>%
+  separate("CD", (c("stabbrev", "congdist0")), sep = "-")
+```
+
+Add leading 0s to the ANES data
+```{r}
+econ2016recode$congdist0 <- str_pad(econ2016recode$congdist, width = 2, side = "left", pad = "0")
+```
+
+
+# Combine econ2016recode and geo2016recoded
+
+```{r}
+combine2016 <- merge(econ2016recode, citylab_re, by = c("stabbrev", "congdist0"))
+```
+

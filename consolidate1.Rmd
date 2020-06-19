@@ -1,0 +1,300 @@
+---
+title: "Consolidate1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(gmodels)
+```
+
+# Import Data Sets
+
+## ANES
+```{r}
+anes2016all <- read_dta("anes2016.dta")
+```
+
+## City Lab
+Taken from [City Lab](https://github.com/theatlantic/citylab-data/tree/master/citylab-congress)
+citylab_cdi_extended.csv
+```{r}
+citylab <- read_csv("citylab_cdi.csv")
+```
+
+## Daily Kos
+```{r}
+dailykos <- read_csv("Daily Kos Elections 2008, 2012 & 2016 presidential election results for congressional districts used in 2016 elections - Results.csv", 
+                     skip = 1)
+```
+
+
+# Select and Recode Needed Variables
+
+## ANES economic data **still need to figure out what to do about social class variable**
+```{r}
+# select needed economic variables
+econ2016 <- anes2016all %>%
+  select(c(
+    caseid,
+    stfips, # STATE FIPS CODE
+    stabbrev, # STATE ABBREVIATION
+    congdist, # CONGRESSIONAL DISTRICT NUMBER
+    libcon, # POLITICAL ID (FORCED): 6 = STRONG CONSERVATIVE ... 0 = STRONG LIBERAL
+    partyid, # PARTISAN ID: 6 = STRONG REP ... 0 = STRONG DEM
+    V161267x, # PRE: SUMMARY - RESPONDENT AGE GROUP
+    educ, # 1 = LESS THAN HIGH SCHOOL ... 8 = DOCTORATE OR PROFESSIONAL
+    V161270, # PRE: HIGHEST LEVEL OF EDUCATION
+    race, # 1 = WHITE, 2 = BLACK, 3 = ASIAN, 4 = NATIVE, 5 = HISPANIC, 6 = OTHER
+    hispanic, # 1 = R IS HISPANIC, 0 = OTHERWISE
+    white, # 1 = R IS WHITE NON-HISPANIC, 0 = OTHERWISE
+    white1, # 1 = R IS WHITE (INCLUDING HISPANIC WHITES), 0 = OTHERWISE
+    black, # 1 = R IS BLACK NON-HISPANIC, 0 = OTHERWISE
+    asian, # 1 = R IS ASIAN NON-HISPANIC, 0 = OTHERWISE
+    natamer, # 1 = R IS NATIVE AMERICAN NON-HISPANIC, 0 = OTHERWISE
+    otherrace, # 1 = R IS OTHER OR MIXED RACE, 0 = OTHERWISE
+    gender, # 1 = R IS A WOMAN, 0 = MAN
+    govservice, # GOV SERVICES SCALE: 6 = GOV SHOULD PROVIDE MORE SERVICES
+    medinsur, # MEDICAL INSURANCE SCALE: 6 = GOV INSUANCE ... 0 = PRIVATE INSURANCE
+    fedgun, # 2 = GUN PURCHASE EASIER, 1 = THE SAME, 0 = GUN PURCHASE MORE DIFFICULT
+    govjob, # GOV JOB SCALE: 6 = GOV GUARANTEES JOBS ... 0 = GET JOBS ON OWN
+    govblacks, # AID TO BLACKS SCALE: 6 = GOV SHOULD HELP BLACKS ... 0 = BLACKS HELP SELVES
+    ssocsec, # 1 = INCREASED SPENDING ON SOCSEC, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sschools, # 1 = INCREASED SPENDING ON SCHOOLS, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sscience, # 1 = INCREASED SPENDING ON SCIENCE, 0 = KEEP SAME, -1 DECREASED SPENDING
+    swelfare, # 1 = INCREASED SPENDING ON WELFARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    schildcare, # 1 = INCREASED SPEND ON CHILD CARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    spoor, # 1 = INCREASED SPEND ON POOR, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    senviron, # 1 = INCREASED SPEND ON ENVIRONMENT, 0 = KEEP SAME, -1 = DECREASED,
+    gwaction, # 6 = GOV SHOULD BE DOING GREAT DEAL MORE FOR GLOBAL WARMING ... 0 = LESS
+    govinequality, # 2 = R SUPPORT GOV EFFORTS TO REDUCE INEQUALITY, 1 = NEUTRAL, 0 = OPPOSE
+    shealthcare7, # 6 = SUPPORT STRONG INCREASE IN HEALTH CARE SPEND, 0 = STRONG DECREASE
+    taxmillion, # 2 = SUPPORTS INCREASING TAXES ON MILLIONAIRES, 1 = NEUTRAL, 0 = OPPOSE
+    govprob, # 1 = GOV DOING TOO MUCH, 0 = PROBLEMS ARE BIGGER
+    fmarket, # 1 = FREE MARKET CAN HANDLE PROBLEMS, 0 = GOV NEEDED TO SOLVE PROBLEMS
+    govless, # 1 = LESS GOV THE BETTER, 0 = GOV SHOULD DO MORE THINGS
+    gregbus, # 4 = A GREAT DEAL OF REGULATION IS GOOD FOR SOCIETY ... 0 = NONE AT ALL
+  ))
+
+# remove NA
+econ2016 <- na.omit(econ2016)
+
+# ensure larger numbers are always liberal
+econ2016 <- econ2016 %>%
+  mutate(libcon = recode(libcon, #recode so 6 = strong liberal and 0 = strong conservative
+                         `0` = 6,
+                         `1` = 5,
+                         `2` = 4, 
+                         `4` = 2,
+                         `5` = 1, 
+                         `6` = 0
+                          )) %>%
+  mutate(partyid = recode(partyid, #recode so 6 = strong Democrat and 0 = strong Republican
+                          `0` = 6,
+                          `1` = 5,
+                          `2` = 4, 
+                          `4` = 2,
+                          `5` = 1, 
+                          `6` = 0
+                          )) # %>%
+#  mutate(educ5 = recode(V161270, # recode to fewer categories
+#                       `1` = 0, # (was less than 1st) 0 = less than high school diploma
+#                       `2` = 0, # (was 1st - 4th) 0 = less than high school diploma
+#                       `3` = 0, # (was 5 - 6) 0 = less than high school diploma
+#                       `4` = 0, # (was 7-8) 0 = less than high school diploma
+#                       `5` = 0, # (was 9) 0 = less than high school diploma
+#                       `6` = 0, # (was 10) 0 = less than high school diploma
+#                       `7` = 0, # (was 11) 0 = less than high school diploma
+#                       `8` = 0, # (was 12) 0 = less than high school diploma
+#                       `9` = 1, # 1 = high school diploma or equivalency
+#                       `10` = 2, # 2 = some college but no degree
+#                       `11` = 3, # 3 = Associate degree
+#                       `12` = 3, # 3 = Associate degree
+#                       `13` = 4, # 4 = Bachelor's degree or higher
+#                       `14` = 4, # 4 = Bachelor's degree or higher
+#                       `15` = 4, # 4 = Bachelor's degree or higher
+#                       `16` = 4, # 4 = Bachelor's degree or higher
+#                       `90` = 1, # 1 = high school diploma
+#                       `95` = 9, # 9 = other or refused
+#                       `9` = 9 # 9 = other or refused
+#                       ))
+
+# collapse larger scales
+econ2016 <- econ2016 %>%
+  mutate(govservice1 = recode(govservice,
+                              `6` = 1,
+                              `5` = 1,
+                              `4` = 1,
+                              `3` = 0, 
+                              `2` = -1,
+                              `1` = -1, 
+                              `0` = -1
+                              )) %>%
+  mutate(medinsur1 = recode(medinsur,
+                            `6` = 1,
+                            `5` = 1,
+                            `4` = 1,
+                            `3` = 0, 
+                            `2` = -1,
+                            `1` = -1, 
+                            `0` = -1
+                            )) %>%
+  mutate(govjob1 = recode(govjob,
+                          `6` = 1,
+                          `5` = 1,
+                          `4` = 1,
+                          `3` = 0, 
+                          `2` = -1,
+                          `1` = -1, 
+                          `0` = -1))
+
+# create additive scale of all econ answers
+econ2016 <- econ2016 %>%
+  mutate(fecon2016 = 
+           govservice1 + 
+           medinsur1 + 
+           govjob1 + 
+           ssocsec +
+           sschools +
+           sscience +
+           swelfare +
+           schildcare +
+           spoor +
+           senviron)
+
+# select needed variables
+econ2016 <- econ2016 %>%
+  select("caseid", "stfips", "stabbrev", "congdist", "libcon", "partyid", "educ", "race", "hispanic", "white", "white1", "black", "asian", "natamer", "otherrace", "gender", "fecon2016")
+```
+
+## City Lab Urban/Rural Classification
+```{r}
+# Recode Cluster to be categorical numeric of decreasing urbanity/increasing rural
+districtpop <- citylab %>%
+  mutate(clust = ifelse(Cluster == "Pure rural", 6,
+                        ifelse(Cluster == "Rural-suburban mix", 5,
+                               ifelse(Cluster == "Sparse suburban", 4,
+                                      ifelse(Cluster == "Dense suburban", 3,
+                                             ifelse(Cluster == "Urban-suburban mix", 2,
+                                                    ifelse(Cluster == "Pure urban", 1, 0
+                                                           )))))))
+
+#select needed variables
+districtpop <- districtpop %>%
+  select("CD", "clust", "Cluster")
+```
+
+## Daily Kos percent voted blue
+```{r}
+# make variable for % Clinton vote into blue vote
+election <- dailykos %>%
+  mutate(bluevote = Clinton)
+
+# select needed variables
+election <- election %>%
+  select("CD", "bluevote")
+```
+
+
+# Combine Data Sets
+
+## Daily Kos + City Lab 
+```{r}
+# combine data sets using CD variable -- same format
+combine2016 <- merge(districtpop, election, by = c("CD"))
+```
+
+## Add ANES data
+```{r}
+# alter formatting of CD variable to be like ANES
+combine2016 <- combine2016 %>%
+  separate("CD", (c("stabbrev", "congdist0")), sep = "-")
+
+# add leading 0 into ANES
+econ2016$congdist0 <- str_pad(econ2016$congdist, width = 2, side = "left", pad = "0")
+
+# combine two data sets
+combine2016 <- merge(econ2016, combine2016, by = c("stabbrev", "congdist0"))
+```
+
+
+# Distributions of Variables
+
+## Economic issue positions
+```{r}
+hist(econ2016$fecon2016)
+```
+
+## Liberal/Conservative
+```{r}
+hist(econ2016$libcon)
+```
+
+## Party ID
+```{r}
+hist(econ2016$partyid)
+```
+
+# Cross Tabulations
+
+## Issue positions and ideological identification
+```{r}
+CrossTable(combine2016$fecon2016, combine2016$libcon)
+```
+
+
+# Regressions
+
+Multiple Linear Regression Example:
+fit <- lm(y ~ x1 + x2 + x3, data=mydata)
+summary(fit) # show results
+
+## Model 1: Urban/rural (x = clust) effects policy positions (y)
+```{r}
+first <- lm(fecon2016 ~ clust, data = combine2016)
+summary(first)
+```
+```{r}
+# create new dataframes for each political ID
+alllib <- filter(combine2016, libcon == c(6, 5, 4))
+
+stlib <- filter(combine2016, libcon == 6) # STRONG LIBERAL
+
+lib <- filter(combine2016, libcon == 5) # LIBERAL
+
+mlib <- filter(combine2016, libcon == 4) # MODERATE LIBERAL
+
+mod <- filter(combine2016, libcon == 3) # MODERATE
+
+mcon <- filter(combine2016, libcon == 2) # MODERATE CONSERVATIVE
+
+con <- filter(combine2016, libcon == 1) # CONSERVATIVE
+
+scon <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
+
+allcon <- filter(combine2016, libcon == c(2, 1, 0))
+
+# create new dataframes for party ID
+sdem <- filter(combine2016, partyid == 6) # STRONG DEMOCRAT
+
+srep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
+
+# create new dataframes for each urban/rural classification
+
+```
+
+
+
+
+## Model 2: Urban/rural + district blueness effect on issue positions
+```{r}
+second <- lm(fecon2016 ~ clust + bluevote, data = combine2016)
+summary(second)
+```
+
+
+
+

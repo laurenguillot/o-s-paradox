@@ -1,0 +1,30 @@
+---
+title: "regress1"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+## Base line: how well political ID (x = libcon) predicts issue positions (y = fecon2016)
+```{r}
+base <- lm(fecon2016 ~ libcon, data = combine2016)
+
+summary(base)
+```
+
+- significant to the 0.05
+- a 1 unit change in libcon -> 2 unit change in issue positions
+- R sq shows it predicts about 41% of cases
+
+## Model 1: effect cluster has on the relationship between ideological ID and issue position
+```{r}
+one <- lm(fecon2016 ~ libcon + clust, data = combine2016)
+
+summary(one)
+```
+

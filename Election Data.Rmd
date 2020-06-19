@@ -1,0 +1,22 @@
+---
+title: "Election Data"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+```
+
+## Data obtained from [Daily Kos](https://www.dailykos.com/stories/2018/2/21/1742660/-The-ultimate-Daily-Kos-Elections-guide-to-all-of-our-data-sets#1)
+
+```{r}
+election <- Daily_Kos_Elections_2008_2012_2016_presidential_election_results_for_congressional_districts_used_in_2016_elections_Results
+```
+
+```{r}
+election <- election %>%
+  mutate(demvote = Clinton)
+```
+

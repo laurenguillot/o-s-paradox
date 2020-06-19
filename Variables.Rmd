@@ -1,0 +1,106 @@
+---
+title: "Variables"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+# Visualizing Variables
+
+## Political ID
+
+6 = Strong Liberal
+.
+0 = Strong Conservative
+```{r}
+ggplot(econ2016recode, aes(x = libcon)) + 
+  geom_bar(stat = "count")
+```
+
+## Partisan Identification
+
+6 = Strong Democrat 
+.
+0 = Strong Republican
+
+```{r}
+ggplot(econ2016recode, aes(x = partyid)) +
+  geom_bar(stat = "count")
+```
+
+
+## Government services and spending scale
+
+6 = govenrnment should provide more services
+.
+0 = government should provide fewer services
+
+```{r}
+ggplot(econ2016recode, aes(x = govservice)) +
+  geom_bar(stat = "count")
+```
+
+## Medical Insurance Scale
+
+6 = government insurance
+.
+0 = private insurance
+
+```{r}
+ggplot(econ2016recode, aes(x = medinsur)) +
+  geom_bar(stat = "count")
+```
+
+
+
+    medinsur, # MEDICAL INSURANCE SCALE: 6 = GOV INSUANCE ... 0 = PRIVATE INSURANCE
+    fedgun, # 2 = GUN PURCHASE EASIER, 1 = THE SAME, 0 = GUN PURCHASE MORE DIFFICULT
+    govjob, # GOV JOB SCALE: 6 = GOV GUARANTEES JOBS ... 0 = GET JOBS ON OWN
+    govblacks, # AID TO BLACKS SCALE: 6 = GOV SHOULD HELP BLACKS ... 0 = BLACKS HELP SELVES
+    ssocsec, # 1 = INCREASED SPENDING ON SOCSEC, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sschools, # 1 = INCREASED SPENDING ON SCHOOLS, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sscience, # 1 = INCREASED SPENDING ON SCIENCE, 0 = KEEP SAME, -1 DECREASED SPENDING
+    swelfare, # 1 = INCREASED SPENDING ON WELFARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    schildcare, # 1 = INCREASED SPEND ON CHILD CARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    spoor, # 1 = INCREASED SPEND ON POOR, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    senviron, # 1 = INCREASED SPEND ON ENVIRONMENT, 0 = KEEP SAME, -1 = DECREASED,
+    govinequality, # 2 = R SUPPORT GOV EFFORTS TO REDUCE INEQUALITY, 1 = NEUTRAL, 0 = OPPOSE
+    
+    
+# Cross Tabulations
+
+```{r}
+xtabs( ~ libcon + partyid, data = econ2016recode)
+```
+
+
+
+caseid,
+    stfips, # STATE FIPS CODE
+    stabbrev, # STATE ABBREVIATION
+    congdist, # CONGRESSIONAL DISTRICT NUMBER
+    libcon, # POLITICAL ID (FORCED): 6 = strong liberal ... 0 = strong conservative 
+    partyid, # PARTISAN ID: 6 = STRONG REP ... 0 = STRONG DEM
+    govservice, # GOV SERVICES SCALE: 6 = GOV SHOULD PROVIDE MORE SERVICES
+    medinsur, # MEDICAL INSURANCE SCALE: 6 = GOV INSUANCE ... 0 = PRIVATE INSURANCE
+    fedgun, # 2 = GUN PURCHASE EASIER, 1 = THE SAME, 0 = GUN PURCHASE MORE DIFFICULT
+    govjob, # GOV JOB SCALE: 6 = GOV GUARANTEES JOBS ... 0 = GET JOBS ON OWN
+    govblacks, # AID TO BLACKS SCALE: 6 = GOV SHOULD HELP BLACKS ... 0 = BLACKS HELP SELVES
+    ssocsec, # 1 = INCREASED SPENDING ON SOCSEC, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sschools, # 1 = INCREASED SPENDING ON SCHOOLS, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sscience, # 1 = INCREASED SPENDING ON SCIENCE, 0 = KEEP SAME, -1 DECREASED SPENDING
+    swelfare, # 1 = INCREASED SPENDING ON WELFARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    schildcare, # 1 = INCREASED SPEND ON CHILD CARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    spoor, # 1 = INCREASED SPEND ON POOR, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    senviron, # 1 = INCREASED SPEND ON ENVIRONMENT, 0 = KEEP SAME, -1 = DECREASED,
+    gwaction, # 6 = GOV SHOULD BE DOING GREAT DEAL MORE FOR GLOBAL WARMING ... 0 = LESS
+    govinequality, # 2 = R SUPPORT GOV EFFORTS TO REDUCE INEQUALITY, 1 = NEUTRAL, 0 = OPPOSE
+    shealthcare7, # 6 = SUPPORT STRONG INCREASE IN HEALTH CARE SPEND, 0 = STRONG DECREASE
+    taxmillion, # 2 = SUPPORTS INCREASING TAXES ON MILLIONAIRES, 1 = NEUTRAL, 0 = OPPOSE
+    govprob, # 1 = GOV DOING TOO MUCH, 0 = PROBLEMS ARE BIGGER
+    fmarket, # 1 = FREE MARKET CAN HANDLE PROBLEMS, 0 = GOV NEEDED TO SOLVE PROBLEMS
+    govless, # 1 = LESS GOV THE BETTER, 0 = GOV SHOULD DO MORE THINGS
+    gregbus, # 4 = A GREAT DEAL OF REGULATION IS GOOD FOR SOCIETY ... 0 = NONE AT ALL

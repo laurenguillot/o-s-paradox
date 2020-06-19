@@ -1,0 +1,118 @@
+---
+title: "Geographic Data"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+Data from ArcGIS Hub
+
+[here](https://hub.arcgis.com/datasets/ff48bbae433442a38f6c635b8c7baf72_0/data?geometry=11.844%2C-0.129%2C102.899%2C76.650)
+
+Filter data set for selected variables
+
+* ObjectID
+* ID
+* Name
+* State Abbreviation
+* 2016 Total Population
+* 2016 Population Density (Pop per square mile)
+* 2010 - 2016 Population: Annual Growth Rate
+
+```{r}
+geo2016 <- geo %>%
+  select(c(
+    OBJECTID,
+    ID,
+    NAME, # NAME OF THE CONGRESSIONAL DISTRICT
+    ST_ABBREV,
+    TOTPOP_CY, # TOTAL POPULATION OF DISTRICT IN 2016
+    POPDENS_CY, # POPULATION DENSITY OF DISTRICT IN 2016
+    POPGRW10CY # POPULATION GROWTH RATE 2010 - 2016
+  ))
+```
+
+Remove characters from NAME to leave just the congressional district number
+
+```{r}
+geo2016recoded <- geo2016
+
+# remove alphabetic characters
+geo2016recoded$NAME <- gsub("[a-zA-Z ]", "", geo2016$NAME)
+
+# remove dash
+geo2016recoded$NAME <- gsub("\\-", "", geo2016recoded$NAME)
+
+# make vector numeric
+geo2016recoded$NAME <- as.double(geo2016recoded$NAME)
+
+# turn ST_ABBREV into a character variable
+geo2016recoded$ST_ABBREV <- as.character(geo2016recoded$ST_ABBREV)
+
+# turn POPDENS_CY into a numeric
+geo2016recoded$POPDENS_CY <- as.numeric(geo2016recoded$POPDENS_CY)
+
+# round to whole numbers
+geo2016recoded$POPDENS_CY <- round(geo2016recoded$POPDENS_CY, digits = 0)
+```
+
+Rename columns to be equivalent with that of columns from economic
+
+```{r}
+geo2016recoded <- geo2016recoded %>%
+  rename(
+    stabbrev = ST_ABBREV,
+    congdist = NAME
+  )
+```
+
+
+
+
+
+Don't use: Make Population Density into a categorical variable
+```{r}
+#geo2016recoded <- geo2016recoded %>%
+##  mutate(popdens = ifelse(POPDENS_CY %in% 0:49, 1, 
+#   ifelse(POPDENS_CY %in% 50:99, 50,
+#    ifelse(POPDENS_CY %in% 100:149, 100,
+#      ifelse(POPDENS_CY %in% 150:199, 150,
+#       ifelse(POPDENS_CY %in% 200:249, 200,
+#        ifelse(POPDENS_CY %in% 250:299, 250,
+#         ifelse(POPDENS_CY %in% 300:349, 300,
+#          ifelse(POPDENS_CY %in% 350:399, 350,
+#           ifelse(POPDENS_CY %in% 400:449, 400,
+#            ifelse(POPDENS_CY %in% 450:499, 450,
+#             ifelse(POPDENS_CY %in% 500:549, 500,
+#              ifelse(POPDENS_CY %in% 550:599, 550,
+#               ifelse(POPDENS_CY %in% 600:649, 600,
+ #               ifelse(POPDENS_CY %in% 650:699, 650,
+#                 ifelse(POPDENS_CY %in% 700:749, 700,
+#                  ifelse(POPDENS_CY %in% 750:799, 750,
+#                   ifelse(POPDENS_CY %in% 800:849, 800,
+#                    ifelse(POPDENS_CY %in% 850:899, 850,
+##                     ifelse(POPDENS_CY %in% 900:949, 900,
+#                      ifelse(POPDENS_CY %in% 950:999, 950,
+#                       ifelse(POPDENS_CY %in% 1000:1049, 1000,
+#                        ifelse(POPDENS_CY %in% 1050:1099, 1050,
+#                         ifelse(POPDENS_CY %in% 1100:1149, 1100,
+#                          ifelse(POPDENS_CY %in% 1150:1199, 1150,
+#                           ifelse(POPDENS_CY %in% 1200:1249, 1200,
+#                            ifelse(POPDENS_CY %in% 1250:1299, 1250,
+#                             ifelse(POPDENS_CY %in% 1300:1349, 1300,
+#                              ifelse(POPDENS_CY %in% 1350:1399, 1350,
+#                               ifelse(POPDENS_CY %in% 1400:1459, 1400, 999999
+#                              ))))))))))))))))))))))))))))))
+
+# need to figure out how to distribute the population better
+# maybe you just need to remove the outliers at the very end, maybe anything over 4,000 per square mile?
+```
+
+```{r}
+hist(geo2016recoded$popdens)
+```
+

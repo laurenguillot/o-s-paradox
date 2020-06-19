@@ -1,0 +1,24 @@
+---
+title: "Combine Data"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(plyr)
+```
+
+Make vector of congressional districts into a numeric vector 
+
+```{r}
+econ2016recode$congdist <- as.numeric(econ2016recode$congdist)
+```
+
+
+# Combine econ2016recode and geo2016recoded
+
+```{r}
+combine2016 <- merge(econ2016recode, geo2016recoded, by = c("stabbrev", "congdist"))
+```
+

@@ -1,0 +1,183 @@
+---
+title: "Regressions"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+# Regressions
+
+Independent variable (x) = clutster (urban/rural classification)
+Dependent variable (y) = Liberal issue answers
+
+# Multiple Linear Regression Example
+fit <- lm(y ~ x1 + x2 + x3, data=mydata)
+summary(fit) # show results
+
+
+## First: x = clust, y = fecon2016
+```{r}
+first <- lm(fecon2016 ~ clust, data = combine2016)
+
+summary(first)
+
+firstplot <- plot(fecon2016 ~ clust, data = combine2016)
+
+ggplot(combine2016, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+## Second: x = clust, x = fecon2016 filtered by political ID
+```{r}
+# create new dataframes for each political ID
+alllib <- filter(combine2016, libcon == c(6, 5, 4))
+
+stlib <- filter(combine2016, libcon == 6) # STRONG LIBERAL
+
+lib <- filter(combine2016, libcon == 5) # LIBERAL
+
+mlib <- filter(combine2016, libcon == 4) # MODERATE LIBERAL
+
+mod <- filter(combine2016, libcon == 3) # MODERATE
+
+mcon <- filter(combine2016, libcon == 2) # MODERATE CONSERVATIVE
+
+con <- filter(combine2016, libcon == 1) # CONSERVATIVE
+
+scon <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
+
+allcon <- filter(combine2016, libcon == c(2, 1, 0))
+
+# create new dataframes for party ID
+sdem <- filter(combine2016, partyid == 6) # STRONG DEMOCRAT
+
+srep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
+```
+
+all liberal
+```{r}
+alllib_reg <- lm(fecon2016 ~ clust, data = alllib)
+
+summary(alllib_reg)
+```
+
+
+strong liberal
+```{r}
+stlib_reg <- lm(fecon2016 ~ clust, data = stlib)
+
+summary(stlib_reg)
+
+plot(fecon2016 ~ clust, data = stlib)
+
+ggplot(stlib, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Liberal
+```{r}
+lib_reg <- lm(fecon2016 ~ clust, data = lib)
+
+summary(lib_reg)
+
+plot(fecon2016 ~ clust, data = lib)
+
+ggplot(lib, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Moderate Liberal
+```{r}
+mlib_reg <- lm(fecon2016 ~ clust, data = mlib)
+
+summary(mlib_reg)
+
+plot(fecon2016 ~ clust, data = mlib)
+
+ggplot(mlib, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Moderate
+```{r}
+mod_reg <- lm(fecon2016 ~ clust, data = mod)
+
+summary(mod_reg)
+
+plot(fecon2016 ~ clust, data = mod)
+
+ggplot(mod, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Moderate Conservative
+```{r}
+mcon_reg <- lm(fecon2016 ~ clust, data = mcon)
+
+summary(mcon_reg)
+
+plot(fecon2016 ~ clust, data = mcon)
+
+ggplot(mcon, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Conservative
+```{r}
+con_reg <- lm(fecon2016 ~ clust, data = con)
+
+summary(con_reg)
+
+plot(fecon2016 ~ clust, data = con)
+
+ggplot(con, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+Strong Conservative
+```{r}
+scon_reg <- lm(fecon2016 ~ clust, data = scon)
+
+summary(scon_reg)
+
+plot(fecon2016 ~ clust, data = scon)
+
+ggplot(scon, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+All Conservative
+```{r}
+allcon_reg <- lm(fecon2016 ~ clust, data = allcon)
+
+summary(allcon_reg)
+```
+
+
+Strong Democrat
+```{r}
+stlib_reg <- lm(fecon2016 ~ clust, data = stlib)
+
+summary(stlib_reg)
+
+plot(fecon2016 ~ clust, data = sdem)
+
+ggplot(sdem, aes(x = clust, y = fecon2016)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+
+
+# Calculate frequency of mismatchers
+```{r}
+
+```
+

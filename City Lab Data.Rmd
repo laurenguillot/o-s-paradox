@@ -1,0 +1,46 @@
+---
+title: "City Lab Data"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(scales)
+library(sf)
+library(stringr)
+library(readxl)
+library(readr)
+library(plyr)
+```
+
+## City Lab Data
+
+Taken from [City Lab](https://github.com/theatlantic/citylab-data/tree/master/citylab-congress)
+citylab_cdi_extended.csv
+
+# Recode Cluster to be categorical numeric of decreasing urbanity/increasing rural
+Pure urban = 1
+Urban-suburban mix = 2
+Dense suburban = 3
+Sparse suburban = 4
+Rural-suburban mix = 5
+Pure rural = 6
+
+```{r}
+citylab_re <- citylab_cdi %>%
+  mutate(clust = ifelse(Cluster == "Pure rural", 6,
+                        ifelse(Cluster == "Rural-suburban mix", 5,
+                               ifelse(Cluster == "Sparse suburban", 4,
+                                      ifelse(Cluster == "Dense suburban", 3,
+                                             ifelse(Cluster == "Urban-suburban mix", 2,
+                                                    ifelse(Cluster == "Pure urban", 1, 0
+                                                           )))))))
+```
+
+# Select only needed data
+```{r}
+citylab_re <- citylab_re %>%
+  select("CD", "clust", "Cluster")
+```
+
