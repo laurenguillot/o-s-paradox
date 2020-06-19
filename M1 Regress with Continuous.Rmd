@@ -1,0 +1,165 @@
+---
+title: "Model 1 Regress with Continuous Variables"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(gmodels)
+```
+
+# Notes
+
+
+
+Multiple Linear Regression Example:
+fit <- lm(y ~ x1 + x2 + x3, data=mydata)
+summary(fit) # show results
+
+## Model 1: Urban/rural (x = POPDENS_CY) effects policy positions (y = fecon2016) for each of the ideological and party identities
+
+Strong Liberal
+```{r}
+regress1_stlib <- lm(fecon2016 ~ POPDENS_CY, data = st_lib)
+summary(regress1_stlib)
+```
+* The econ factor score is predicted to increase 0.000007765 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the factor score is at 8.852
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.513, so it is not significant
+
+Liberal
+```{r}
+regress1_lib <- lm(fecon2016 ~ POPDENS_CY, data = lib)
+summary(regress1_lib)
+```
+* The econ factor score is predicted to decrease (become more conservative) -0.0000001798 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 7.915
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.983, so it is not significant
+
+Moderate Liberal
+```{r}
+regress1_mlib <- lm(fecon2016 ~ POPDENS_CY, data = m_lib)
+summary(regress1_mlib)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00002055 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.862
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.107, so it is not significant
+
+Moderate Ideology
+```{r}
+regress1_modid <- lm(fecon2016 ~ POPDENS_CY, data = mod_id)
+summary(regress1_modid)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00003715 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.184
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00107, so it is significant to the p < 0.01
+
+Moderate Conservative
+```{r}
+regress1_mcon <- lm(fecon2016 ~ POPDENS_CY, data = m_con)
+summary(regress1_mcon)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00007271 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 5.503
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0108, so it is significant at the p<0.05
+
+Conservative
+```{r}
+regress1_con <- lm(fecon2016 ~ POPDENS_CY, data = con)
+summary(regress1_con)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.0001224 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 3.959
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00284, so it is significant at the p<0.01
+
+---------------------------------------------------------
+
+Strong Conservative
+```{r}
+regress1_stcon <- lm(fecon2016 ~ POPDENS_CY, data = st_con)
+summary(regress1_stcon)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.0001132 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 3.576
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.362, so it is not significant
+
+========================================
+
+Strong Democrat
+```{r}
+regress1_stdem <- lm(fecon2016 ~ POPDENS_CY, data = st_dem)
+summary(regress1_stdem)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.0000128 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 7.821
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0799, so it is slightly significant at the p<0.1
+
+----------------------------------------------
+
+Democrat
+```{r}
+regress1_dem <- lm(fecon2016 ~ POPDENS_CY, data = dem)
+summary(regress1_dem)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00002099 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.801
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0925, so it is slightly significant at the p<0.1
+
+---------------------------------------------------
+
+Moderate Democrat
+```{r}
+regress1_mdem <- lm(fecon2016 ~ POPDENS_CY, data = m_dem)
+summary(regress1_mdem)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00002852 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 7.140
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.115, so it is not significant
+
+-------------------------------------------
+
+Moderate Party ID
+```{r}
+regress1_modparty <- lm(fecon2016 ~ POPDENS_CY, data = mod_party)
+summary(regress1_modparty)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00003248 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.13
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0855, so it is slightly significant at the p<0.1
+
+---------------------------------------
+
+Moderate Republican
+```{r}
+regress1_mrep <- lm(fecon2016 ~ POPDENS_CY, data = m_rep)
+summary(regress1_mrep)
+```
+* The econ factor score is predicted to decrease (become more conservative) -0.00002748 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 4.761
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.586, so it is not significant
+
+-------------------------------------------------
+
+Republican
+```{r}
+regress1_rep <- lm(fecon2016 ~ POPDENS_CY, data = rep)
+summary(regress1_rep)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.00004634 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 4.794
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0404, so it is significant at the p<0.05
+
+-------------------------------------------------------
+
+Strong Republican
+```{r}
+regress1_strep <- lm(fecon2016 ~ POPDENS_CY, data = st_rep)
+summary(regress1_strep)
+```
+* The econ factor score is predicted to increase (become more liberal) 0.0001599 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 3.988
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.000255, so it is significant at p<0.001
+
