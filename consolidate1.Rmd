@@ -18,12 +18,15 @@ library(gmodels)
 anes2016all <- read_dta("anes2016.dta")
 ```
 
-## City Lab
+## City Lab -- only if using pop dens as a catagorical variable
 Taken from [City Lab](https://github.com/theatlantic/citylab-data/tree/master/citylab-congress)
 citylab_cdi_extended.csv
 ```{r}
-citylab <- read_csv("citylab_cdi.csv")
+#citylab <- read_csv("citylab_cdi.csv")
 ```
+
+## Arc GIS data (from Geographic Data.Rmd)
+
 
 ## Daily Kos
 ```{r}

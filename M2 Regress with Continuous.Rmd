@@ -1,0 +1,173 @@
+---
+title: "Model 2 Regress with Continuous Variables"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(gmodels)
+```
+
+# Notes
+
+
+
+Multiple Linear Regression Example:
+fit <- lm(y ~ x1 + x2 + x3, data=mydata)
+summary(fit) # show results
+
+## Model 2: Urban/rural (x = POPDENS_CY) and District voting history (bluevote) effects policy positions (y = fecon2016) for each of the ideological and party identities
+
+Strong Liberal
+```{r}
+regress2_stlib <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = st_lib)
+summary(regress2_stlib)
+```
+* The econ factor score is predicted to increase 0.000006162 for each one unit increase in population density (coefficient beta) and 0.001848 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 8.757
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.648 (pop dens) and 0.799 (blue vote), so it is not significant
+
+--------------------------
+
+Liberal
+```{r}
+regress2_lib <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = lib)
+summary(regress2_lib)
+```
+* The econ factor score is predicted to decrease -0.000004881 for each one unit increase in population density (coefficient beta) and 0.004443 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 7.689
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.618 (pop dens) and 0.340 (blue vote), so it is not significant
+
+--------------------------
+Moderate Liberal
+```{r}
+regress2_mlib <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = m_lib)
+summary(regress2_mlib)
+```
+* The econ factor score is predicted to increase 0.00001879 for each one unit increase in population density (coefficient beta) and 0.001485 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.789
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.200 (pop dens) and 0.808 (blue vote), so it is not significant
+
+--------------------------
+
+Moderate Ideology
+```{r}
+regress2_modid <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = mod_id)
+summary(regress2_modid)
+```
+* The econ factor score is predicted to increase 0.00001409 for each one unit increase in population density (coefficient beta) and 0.01888 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 5.333
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.26979 (pop dens), not significant, and 0.00019 (blue vote), sinigicant at the p<0.001
+
+--------------------------
+
+Moderate Conservative
+```{r}
+regress2_mcon <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = m_con)
+summary(regress2_mcon)
+```
+* The econ factor score is predicted to increase 0.00004194 for each one unit increase in population density (coefficient beta) and 0.01348 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 4.911
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.1932 (pop dens), not significant, and 0.0444 (blue vote), which is significant at the p<0.05 level
+
+--------------------------
+
+Conservative
+```{r}
+regress2_cons <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = con)
+summary(regress2_cons)
+```
+* The econ factor score is predicted to increase 0.00007501 for each one unit increase in population density (coefficient beta) and 0.01437 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 3.389
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.1183 (pop dens), not significant, and 0.0621 (blue vote), which is slightly significant at the 0.1 level
+
+--------------------------
+
+Strong Conservative
+```{r}
+regress2_stcon <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = st_con)
+summary(regress2_stcon)
+```
+* The econ factor score is predicted to increase 0.00009022 for each one unit increase in population density (coefficient beta) and 0.004947 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 3.378
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.536 (pop dens) and 0.761 (blue vote), so it is not significant
+
+===========================================
+
+Strong Democrat
+```{r}
+regress2_stdem <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = st_dem)
+summary(regress2_stdem)
+```
+* The econ factor score is predicted to increase 0.000005507 for each one unit increase in population density (coefficient beta) and 0.006747 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 7.479
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.5141 (pop dens), not significant, and 0.0869 (blue vote), which is slightly significant at the p<0.1
+
+--------------------------
+
+Democrat
+```{r}
+regress2_dem <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = dem)
+summary(regress2_dem)
+```
+* The econ factor score is predicted to increase 0.00001173 for each one unit increase in population density (coefficient beta) and 0.008685 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.368
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.406 (pop dens) and 0.166 (blue vote), so it is not significant
+
+--------------------------
+
+Moderate Democrat
+```{r}
+regress2_mdem <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = m_dem)
+summary(regress2_mdem)
+```
+* The econ factor score is predicted to increase 0.000004939 for each one unit increase in population density (coefficient beta) and 0.01497 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.445
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.8111 (pop dens), not significant, and 0.0229 (blue vote), which is significant at the p<0.05 level
+
+--------------------------
+
+Moderate Party
+```{r}
+regress2_modparty <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = mod_party)
+summary(regress2_modparty)
+```
+* The econ factor score is predicted to increase 0.00003099 for each one unit increase in population density (coefficient beta) and 0.001382 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.068
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.143 (pop dens) and 0.875 (blue vote), so it is not significant
+
+--------------------------
+
+Moderate Republican
+```{r}
+regress2_mrep <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = m_rep)
+summary(regress2_mrep)
+```
+* The econ factor score is predicted to decrease -0.00003815 for each one unit increase in population density (coefficient beta) and 0.003363 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 4.624
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.519 (pop dens) and 0.730 (blue vote), so it is not significant
+
+--------------------------
+
+Republicans
+```{r}
+regress2_rep <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = rep)
+summary(regress2_rep)
+```
+* The econ factor score is predicted to increase 0.00002137 for each one unit increase in population density (coefficient beta) and 0.001909 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 3.966
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.388 (pop dens), not significant, and 0.019 (blue vote), which is significant at the p<0.05
+
+--------------------------
+
+Strong Republicans
+```{r}
+regress2_strep <- lm(fecon2016 ~ POPDENS_CY + bluevote, data = st_rep)
+summary(regress2_strep)
+```
+* The econ factor score is predicted to increase 0.0001423 for each one unit increase in population density (coefficient beta) and 0.004687 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 3.805
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00618 (pop dens), significant at the p<0.01, and 0.799 (blue vote), which is not significant
