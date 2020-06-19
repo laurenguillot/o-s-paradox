@@ -385,7 +385,7 @@ m_con <- filter(combine2016, libcon == 2) # MODERATE CONSERVATIVE
 
 con <- filter(combine2016, libcon == 1) # CONSERVATIVE
 
-s_con <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
+st_con <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
 
 all_con <- filter(combine2016, libcon == c(2, 1, 0)) # ALL CONSERVATIVE
 
@@ -404,10 +404,135 @@ m_rep <- filter(combine2016, partyid == 2) # MODERATE REPUBLICAN
 
 rep <- filter(combine2016, partyid == 1) # REPUBLICAN
 
-srep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
+st_rep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
 
 all_rep <- filter(combine2016, partyid == c(0, 1, 2)) # ALL REPUBLICAN
 ```
 
+## Look at distribution for each group
 
+Strong Liberals
+```{r}
+summary(st_lib$fecon2016)
+```
+* Issue positions lean strongly liberal - no conflicted
+```{r}
+hist(st_lib$fecon2016)
+```
 
+Liberals
+```{r}
+summary(lib$fecon2016)
+```
+* Issue positions lean pretty liberalm - few conflicted
+```{r}
+hist(lib$fecon2016)
+```
+
+Moderate Liberals
+```{r}
+summary(m_lib$fecon2016)
+```
+* Issue positions lean liberal - some conflicted
+```{r}
+hist(m_lib$fecon2016)
+```
+
+Moderates
+```{r}
+summary(mod_id$fecon2016)
+```
+* Issue positions still lean pretty liberal
+```{r}
+hist(mod_party$fecon2016)
+```
+
+Moderate Conservatives
+```{r}
+summary(m_con$fecon2016)
+```
+* Issue positions clustered in the middle - some conflicted
+```{r}
+hist(m_con$fecon2016)
+```
+
+Conservatives
+```{r}
+summary(con$fecon2016)
+```
+* Issue positions lean conservative -- some conflicted
+```{r}
+hist(con$fecon2016)
+```
+
+Strong Conservatives
+```{r}
+summary(st_con$fecon2016)
+```
+* Issue positions lean conservative - some conflicted
+```{r}
+hist(st_con$fecon2016)
+```
+
+Strong Democrats
+```{r}
+summary(st_dem$fecon2016)
+```
+* Issue positions lean pretty liberal - some conflicted
+```{r}
+hist(st_dem$fecon2016)
+```
+
+Democrat
+```{r}
+summary(dem$fecon2016)
+```
+* Issue positions lean pretty liberal - some conflicted
+```{r}
+hist(dem$fecon2016)
+```
+
+Moderate Democrats
+```{r}
+summary(m_dem$fecon2016)
+```
+* Issue positions lean pretty liberal - some conflicted
+```{r}
+hist(m_dem$fecon2016)
+```
+
+Moderate Party
+```{r}
+summary(mod_party$fecon2016)
+```
+* Issue positions lean pretty liberal
+```{r}
+hist(mod_party$fecon2016)
+```
+
+Moderate Republican
+```{r}
+summary(m_rep$fecon2016)
+```
+* Issue positions lean pretty central - some conflicted
+```{r}
+hist(m_rep$fecon2016)
+```
+
+Republican
+```{r}
+summary(rep$fecon2016)
+```
+* Issue positions lean pretty center - some conflicted
+```{r}
+hist(rep$fecon2016)
+```
+
+Strong Republican
+```{r}
+summary(st_rep$fecon2016)
+```
+* Issue positions pretty center - some conflicted
+```{r}
+hist(st_rep$fecon2016)
+```
