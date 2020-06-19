@@ -13,6 +13,10 @@ library(gmodels)
 library(ggplot2)
 ```
 
+# Notes
+* future research can be performed using more comprehensive measures of an area's population, like that of City Lab.
+
+
 # Import And Tidy Data Sets
 
 ## ANES 2016 Survey Data
@@ -419,6 +423,16 @@ summary(st_lib$fecon2016)
 ```{r}
 hist(st_lib$fecon2016)
 ```
+* pop dens pretty rural but some urban
+```{r}
+hist(st_lib$POPDENS_CY, breaks = 300)
+hist(st_lib$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more blue
+```{r}
+hist(st_lib$bluevote)
+```
+
 
 Liberals
 ```{r}
@@ -428,6 +442,16 @@ summary(lib$fecon2016)
 ```{r}
 hist(lib$fecon2016)
 ```
+* pop dens pretty rural with some urban
+```{r}
+hist(lib$POPDENS_CY, breaks = 300)
+hist(lib$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more blue
+```{r}
+hist(lib$bluevote)
+```
+
 
 Moderate Liberals
 ```{r}
@@ -437,6 +461,16 @@ summary(m_lib$fecon2016)
 ```{r}
 hist(m_lib$fecon2016)
 ```
+* pop dens pretty rural with some urban
+```{r}
+hist(m_lib$POPDENS_CY, breaks = 300)
+hist(m_lib$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more center
+```{r}
+hist(m_lib$bluevote)
+```
+
 
 Moderates
 ```{r}
@@ -446,6 +480,17 @@ summary(mod_id$fecon2016)
 ```{r}
 hist(mod_party$fecon2016)
 ```
+* pop dens pretty rural with few urban
+```{r}
+hist(mod_party$POPDENS_CY, breaks = 300)
+hist(mod_party$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(mod_party$bluevote)
+```
+
+
 
 Moderate Conservatives
 ```{r}
@@ -455,6 +500,16 @@ summary(m_con$fecon2016)
 ```{r}
 hist(m_con$fecon2016)
 ```
+* pop dens pretty rural very few urban
+```{r}
+hist(m_con$POPDENS_CY, breaks = 300)
+hist(m_con$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(m_con$bluevote)
+```
+
 
 Conservatives
 ```{r}
@@ -464,6 +519,16 @@ summary(con$fecon2016)
 ```{r}
 hist(con$fecon2016)
 ```
+* pop dens pretty rural with very few urban
+```{r}
+hist(con$POPDENS_CY, breaks = 300)
+hist(con$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(con$bluevote)
+```
+
 
 Strong Conservatives
 ```{r}
@@ -473,6 +538,17 @@ summary(st_con$fecon2016)
 ```{r}
 hist(st_con$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(st_con$POPDENS_CY, breaks = 300)
+hist(st_con$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(st_con$bluevote)
+```
+
+
 
 Strong Democrats
 ```{r}
@@ -482,6 +558,17 @@ summary(st_dem$fecon2016)
 ```{r}
 hist(st_dem$fecon2016)
 ```
+* pop dens rural with some urban
+```{r}
+hist(st_dem$POPDENS_CY, breaks = 300)
+hist(st_dem$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(st_dem$bluevote)
+```
+
+
 
 Democrat
 ```{r}
@@ -491,6 +578,17 @@ summary(dem$fecon2016)
 ```{r}
 hist(dem$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(dem$POPDENS_CY, breaks = 300)
+hist(dem$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context diverse
+```{r}
+hist(dem$bluevote)
+```
+
+
 
 Moderate Democrats
 ```{r}
@@ -500,6 +598,18 @@ summary(m_dem$fecon2016)
 ```{r}
 hist(m_dem$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(m_dem$POPDENS_CY, breaks = 300)
+hist(m_dem$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context all over
+```{r}
+hist(m_dem$bluevote)
+```
+
+
+
 
 Moderate Party
 ```{r}
@@ -509,6 +619,16 @@ summary(mod_party$fecon2016)
 ```{r}
 hist(mod_party$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(mod_party$POPDENS_CY, breaks = 300)
+hist(mod_party$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(mod_party$bluevote)
+```
+
 
 Moderate Republican
 ```{r}
@@ -518,6 +638,17 @@ summary(m_rep$fecon2016)
 ```{r}
 hist(m_rep$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(m_rep$POPDENS_CY, breaks = 300)
+hist(m_rep$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(m_rep$bluevote)
+```
+
+
 
 Republican
 ```{r}
@@ -527,6 +658,20 @@ summary(rep$fecon2016)
 ```{r}
 hist(rep$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(rep$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* pop dens pretty rural
+```{r}
+hist(rep$POPDENS_CY, breaks = 300)
+hist(rep$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(rep$bluevote)
+```
+
 
 Strong Republican
 ```{r}
@@ -536,3 +681,15 @@ summary(st_rep$fecon2016)
 ```{r}
 hist(st_rep$fecon2016)
 ```
+* pop dens pretty rural
+```{r}
+hist(st_rep$POPDENS_CY, breaks = 300)
+hist(st_rep$POPDENS_CY, breaks = 300, xlim = c(10, 2500))
+```
+* voting context leans more red
+```{r}
+hist(st_rep$bluevote)
+```
+
+
+
