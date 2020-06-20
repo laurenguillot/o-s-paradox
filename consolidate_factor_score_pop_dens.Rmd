@@ -9,6 +9,7 @@ library(tidyverse)
 library(dplyr)
 library(tidyr)
 library(haven)
+library(labelled)
 library(gmodels)
 library(ggplot2)
 ```
@@ -27,6 +28,8 @@ anes2016all <- read_dta("anes2016.dta")
 econ2016 <- anes2016all %>%
   select(c(
     caseid,
+    V160101, # Pre election weight, full sample
+    V160102, # Post election weight, full sample
     stfips, # STATE FIPS CODE
     stabbrev, # STATE ABBREVIATION
     congdist, # CONGRESSIONAL DISTRICT NUMBER
@@ -65,6 +68,43 @@ econ2016 <- anes2016all %>%
     govless, # 1 = LESS GOV THE BETTER, 0 = GOV SHOULD DO MORE THINGS
     gregbus, # 4 = A GREAT DEAL OF REGULATION IS GOOD FOR SOCIETY ... 0 = NONE AT ALL
   ))
+
+# combine weights
+econ2016 <- econ2016 %>%
+  mutate(weight = ifelse(V160101 == 0, V160102, V160101))
+
+# remove haven labeling from relevant variables
+econ2016$V161267x <- remove_attributes(econ2016$V161267x, "format.spss")
+econ2016$V161270 <- remove_attributes(econ2016$V161270, "format.spss")
+
+# recode demographic variables for analysis
+econ2016 <- econ2016 %>%
+  mutate(age18_24 = ifelse(V161267x %in% 1:2, 1, 0 #age group 18-20 + 21-24 = 18-24
+                           )) %>%
+  mutate(age25_34 = ifelse(V161267x %in% 3:4, 1, 0 #age group 25-29 + 30-34 = 25-34
+                           )) %>%
+  mutate(age35_44 = ifelse(V161267x %in% 5:6, 1, 0 #age group 35-39 + 40-44 = 35-44
+                           )) %>%
+  mutate(age45_54 = ifelse(V161267x %in% 7:8, 1, 0 #age group 45-49 + 50-54 = 45-54
+                           )) %>%
+  mutate(age55_64 = ifelse(V161267x %in% 9:10, 1, 0 #age group 55-59 + 60-64 = 55-64
+                           )) %>%
+  mutate(age65_74 = ifelse(V161267x %in% 11:12, 1, 0 #age group 65-69 + 70-74 = 65-74
+                           )) %>%
+  mutate(age75 = ifelse(V161267x == 6, 1, 0 #age group 75 or older
+                           )) %>%
+  mutate(lessdiploma = ifelse(V161270 %in% 1:8, 1, 0 #less than 1st, 2-4, 5-6, 7-8, 9, 10, 11, 12 no diploma = less than high school diploma
+                            )) %>%
+  mutate(hsdiploma = ifelse(V161270 == 9, 1, 0 #high school graduate (diploma or equivalent)
+                            )) %>%
+  mutate(somecoll = ifelse(V161270 == 10, 1, 0 #some college but no degree
+                           )) %>%
+  mutate(associate = ifelse(V161270 %in% 11:12, 1, 0 #Associate degree occupational/vocational/academic
+                            )) %>%
+  mutate(bachelors = ifelse(V161270 == 13, 1, 0 #Bachelor's degree
+                            )) %>%
+  mutate(grad = ifelse(V161270 %in% 14:16, 1, 0 #Master's, Professional, Doctorate
+                            ))
 
 # remove NA
 econ2016 <- na.omit(econ2016)
@@ -182,14 +222,14 @@ range(econ2016$fecon2016)
 
 # select needed variables
 econ2016 <- econ2016 %>%
-  select("caseid", "stfips", "stabbrev", "congdist", "libcon", "partyid", "educ", "race", "hispanic", "white", "white1", "black", "asian", "natamer", "otherrace", "gender", "fecon2016")
+  select("caseid", "weight", "stfips", "stabbrev", "congdist", "libcon", "partyid", "educ", "race", "hispanic", "white", "white1", "black", "asian", "natamer", "otherrace", "gender", "fecon2016", "age18_24", "age25_34", "age35_44", "age45_54", "age55_64", "age65_74", "age75", "lessdiploma", "somecoll", "associate", "bachelors", "grad")
 ```
 
 ## Population Density from ArcGIS Hub
 [Source](https://hub.arcgis.com/datasets/ff48bbae433442a38f6c635b8c7baf72_0/data?geometry=11.844%2C-0.129%2C102.899%2C76.650)
 ```{r}
 # create data frame
-geo2016 <- geo %>%
+geo2016 <- X2016_Population_Density_by_Congressional_District %>%
   select(c(
     OBJECTID,
     ID,

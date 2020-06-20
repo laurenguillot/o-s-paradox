@@ -9,6 +9,7 @@ library(tidyverse)
 library(dplyr)
 library(haven)
 library(gmodels)
+library(survey)
 ```
 
 # Notes
@@ -21,9 +22,20 @@ summary(fit) # show results
 
 ## Model 1: Urban/rural (x = POPDENS_CY) effects policy positions (y = fecon2016) for each of the ideological and party identities
 
+*demographic variables: "hispanic" "white", "white1", "black", "asian", "natamer", "otherrace", "gender", "fecon2016", "age18_24", "age25_34", "age35_44", "age45_54", "age55_64", "age65_74", "age75", "lessdiploma", "somecoll", "associate", "bachelors", "grad"
+
+
+
 Strong Liberal
 ```{r}
-regress1_stlib <- lm(fecon2016 ~ POPDENS_CY, data = st_lib)
+wgt_dist <- combine2016 %>%
+  group_by(partyid) %>%
+  summarise()
+
+
+#regress1_stlib <- lm(fecon2016 ~  POPDENS_CY + factor(race) + gender + factor(educ), data = st_lib)
+                     
+  # + hispanic + black + asian + natamer + otherrace + gender + age25_34 + age35_44 + age45_54 + age55_64 + age65_74 + age75 + somecoll + associate + bachelors + grad, data = st_lib)
 summary(regress1_stlib)
 ```
 * The econ factor score is predicted to increase 0.000007765 for each one unit increase in population density (coefficient beta)
