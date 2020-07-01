@@ -10,6 +10,8 @@ library(dplyr)
 library(haven)
 library(gmodels)
 library(survey)
+library(jtools)
+options("jtools-digits" = 8)
 ```
 
 # Notes
@@ -26,152 +28,257 @@ summary(fit) # show results
 
 
 
-Strong Liberal
+Overall
 ```{r}
-wgt_dist <- combine2016 %>%
-  group_by(partyid) %>%
-  summarise()
 
+d_design <- svydesign(ids = ~1, weights = ~weight, data = combine2016)
+
+#summ()
+  
+overall1  <- svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = d_design)
+
+summ(overall1)
 
 #regress1_stlib <- lm(fecon2016 ~  POPDENS_CY + factor(race) + gender + factor(educ), data = st_lib)
                      
   # + hispanic + black + asian + natamer + otherrace + gender + age25_34 + age35_44 + age45_54 + age55_64 + age65_74 + age75 + somecoll + associate + bachelors + grad, data = st_lib)
-summary(regress1_stlib)
 ```
-* The econ factor score is predicted to increase 0.000007765 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the factor score is at 8.852
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.513, so it is not significant
+Condensed Liberal
+```{r}
+alllib_design <- svydesign(ids = ~1, weights = ~weight, data = all_lib)
+
+alllib1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = alllib_design)
+summ(alllib1)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = alllib_design))
+```
+
+Strong Liberal
+```{r}
+stlib_design <- svydesign(ids = ~1, weights = ~weight, data = st_lib)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = stlib_design))
+```
+* The econ factor score is predicted to increase (become more liberal) 1.058e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the factor score is at 
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.147, so it is not significant
 
 Liberal
 ```{r}
-regress1_lib <- lm(fecon2016 ~ POPDENS_CY, data = lib)
-summary(regress1_lib)
+#regress1_lib <- lm(fecon2016 ~ POPDENS_CY, data = lib)
+#summary(regress1_lib)
+
+lib_design <- svydesign(ids = ~1, weights = ~weight, data = lib)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = lib_design))
 ```
-* The econ factor score is predicted to decrease (become more conservative) -0.0000001798 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 7.915
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.983, so it is not significant
+* The econ factor score is predicted to increase (become more liberal) 1.436e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 9.498
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0564, so it is significant at p<0.1
 
 Moderate Liberal
 ```{r}
-regress1_mlib <- lm(fecon2016 ~ POPDENS_CY, data = m_lib)
-summary(regress1_mlib)
+#regress1_mlib <- lm(fecon2016 ~ POPDENS_CY, data = m_lib)
+#summary(regress1_mlib)
+
+mlib1_design <- svydesign(ids = ~1, weights = ~weight, data = m_lib)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = mlib1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00002055 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 6.862
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.107, so it is not significant
+* The econ factor score is predicted to increase (become more liberal) 2.86e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.866
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0105, so it is significant at p<0.05
 
 Moderate Ideology
 ```{r}
-regress1_modid <- lm(fecon2016 ~ POPDENS_CY, data = mod_id)
-summary(regress1_modid)
+#regress1_modid <- lm(fecon2016 ~ POPDENS_CY, data = mod_id)
+#summary(regress1_modid)
+
+modid1_design <- svydesign(ids = ~1, weights = ~weight, data = mod_id)
+
+modid1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = modid1_design)
+summ(modid1)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = modid1_design))
+
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00003715 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 6.184
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00107, so it is significant to the p < 0.01
+* The econ factor score is predicted to increase (become more liberal) 3.825e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.282 (leans liberal)
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00006, so it is significant to the p < 0.001
+
+Condensed Conservative
+```{r}
+allcon_design <- svydesign(ids = ~1, weights = ~weight, data = all_con)
+
+allcon1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = allcon_design)
+summ(allcon1)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = allcon_design))
+```
 
 Moderate Conservative
 ```{r}
-regress1_mcon <- lm(fecon2016 ~ POPDENS_CY, data = m_con)
-summary(regress1_mcon)
+#regress1_mcon <- lm(fecon2016 ~ POPDENS_CY, data = m_con)
+#summary(regress1_mcon)
+
+mcon1_design <- svydesign(ids = ~1, weights = ~weight, data = m_con)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = mcon1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00007271 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 5.503
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0108, so it is significant at the p<0.05
+* The econ factor score is predicted to increase (become more liberal) 4.545e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.081 (leans liberal)
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.08435, so it is significant at the p<0.1
 
 Conservative
 ```{r}
-regress1_con <- lm(fecon2016 ~ POPDENS_CY, data = con)
-summary(regress1_con)
+#regress1_con <- lm(fecon2016 ~ POPDENS_CY, data = con)
+#summary(regress1_con)
+
+con1_design <- svydesign(ids = ~1, weights = ~weight, data = con)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = con1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.0001224 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 3.959
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00284, so it is significant at the p<0.01
+* The econ factor score is predicted to increase (become more liberal) 4.879e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 3.860 (conservative--big jump from moderate)
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.2488, so it is not significant
 
 ---------------------------------------------------------
 
 Strong Conservative
 ```{r}
-regress1_stcon <- lm(fecon2016 ~ POPDENS_CY, data = st_con)
-summary(regress1_stcon)
+#regress1_stcon <- lm(fecon2016 ~ POPDENS_CY, data = st_con)
+#summary(regress1_stcon)
+
+stcon1_design <- svydesign(ids = ~1, weights = ~weight, data = st_con)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = stcon1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.0001132 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 3.576
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.362, so it is not significant
+* The econ factor score is predicted to increase (become more liberal) 3.041e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 3.953
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.771, so it is not significant
 
 ========================================
 
+All Dem
+```{r}
+alldem_design <- svydesign(ids = ~1, weights = ~weight, data = all_dem)
+
+alldem1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = alldem_design)
+summ(alldem1)
+```
+
+
 Strong Democrat
 ```{r}
-regress1_stdem <- lm(fecon2016 ~ POPDENS_CY, data = st_dem)
-summary(regress1_stdem)
+#regress1_stdem <- lm(fecon2016 ~ POPDENS_CY, data = st_dem)
+#summary(regress1_stdem)
+
+stdem1_design <- svydesign(ids = ~1, weights = ~weight, data = st_dem)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = stdem1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.0000128 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 7.821
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0799, so it is slightly significant at the p<0.1
+* The econ factor score is predicted to increase (become more liberal) 1.577e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 8.547
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0142, so it is significant at the p<0.05
 
 ----------------------------------------------
 
 Democrat
 ```{r}
-regress1_dem <- lm(fecon2016 ~ POPDENS_CY, data = dem)
-summary(regress1_dem)
+#regress1_dem <- lm(fecon2016 ~ POPDENS_CY, data = dem)
+#summary(regress1_dem)
+
+dem1_design <- svydesign(ids = ~1, weights = ~weight, data = dem)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = dem1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00002099 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 6.801
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0925, so it is slightly significant at the p<0.1
+* The econ factor score is predicted to increase (become more liberal) 2.044e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.185
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0834, so it is slightly significant at the p<0.1
 
 ---------------------------------------------------
 
 Moderate Democrat
 ```{r}
-regress1_mdem <- lm(fecon2016 ~ POPDENS_CY, data = m_dem)
-summary(regress1_mdem)
+#regress1_mdem <- lm(fecon2016 ~ POPDENS_CY, data = m_dem)
+#summary(regress1_mdem)
+
+mdem1_design <- svydesign(ids = ~1, weights = ~weight, data = m_dem)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = mdem1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00002852 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 7.140
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.115, so it is not significant
+* The econ factor score is predicted to increase (become more liberal) 3.487e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 6.928
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.000121, so it is significant at p<0.001
 
 -------------------------------------------
 
 Moderate Party ID
 ```{r}
-regress1_modparty <- lm(fecon2016 ~ POPDENS_CY, data = mod_party)
-summary(regress1_modparty)
+#regress1_modparty <- lm(fecon2016 ~ POPDENS_CY, data = mod_party)
+#summary(regress1_modparty)
+
+modparty_design <- svydesign(ids = ~1, weights = ~weight, data = mod_party)
+
+modparty1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = modparty_design)
+summ(modparty1)
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00003248 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 6.13
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0855, so it is slightly significant at the p<0.1
+* The econ factor score is predicted to increase (become more liberal) 2.409e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 5.546
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0111, so it is significant at the p<0.05
 
 ---------------------------------------
 
+All Republicans
+```{r}
+allrep_design <- svydesign(ids = ~1, weights = ~weight, data = all_rep)
+
+allrep1 <- svyglm(formula = fecon2016 ~ POPDENS_CY, design = allrep_design)
+summ(allrep1)
+```
+
+
+
 Moderate Republican
 ```{r}
-regress1_mrep <- lm(fecon2016 ~ POPDENS_CY, data = m_rep)
-summary(regress1_mrep)
+#regress1_mrep <- lm(fecon2016 ~ POPDENS_CY, data = m_rep)
+#summary(regress1_mrep)
+
+mrep1_design <- svydesign(ids = ~1, weights = ~weight, data = m_rep)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = mrep1_design))
 ```
-* The econ factor score is predicted to decrease (become more conservative) -0.00002748 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 4.761
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.586, so it is not significant
+* The econ factor score is predicted to decrease (become more conservative) -3.183e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 5.605 (slightly liberal)
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.472, so it is not significant
 
 -------------------------------------------------
 
 Republican
 ```{r}
-regress1_rep <- lm(fecon2016 ~ POPDENS_CY, data = rep)
-summary(regress1_rep)
+#regress1_rep <- lm(fecon2016 ~ POPDENS_CY, data = rep)
+#summary(regress1_rep)
+
+rep1_design <- svydesign(ids = ~1, weights = ~weight, data = rep)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = rep1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.00004634 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 4.794
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0404, so it is significant at the p<0.05
+* The econ factor score is predicted to increase (become more liberal) 6.485e-5 for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 5.049
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.01216, so it is significant at the p<0.05
 
 -------------------------------------------------------
 
 Strong Republican
 ```{r}
-regress1_strep <- lm(fecon2016 ~ POPDENS_CY, data = st_rep)
-summary(regress1_strep)
+#regress1_strep <- lm(fecon2016 ~ POPDENS_CY, data = st_rep)
+#summary(regress1_strep)
+
+strep1_design <- svydesign(ids = ~1, weights = ~weight, data = st_rep)
+
+summ(svyglm(formula = fecon2016 ~ POPDENS_CY + factor(race) + gender + factor(educ), design = strep1_design))
 ```
-* The econ factor score is predicted to increase (become more liberal) 0.0001599 for each one unit increase in population density (coefficient beta)
-* When the predicted population density line is at 0, the predicted factor score is at 3.988
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.000255, so it is significant at p<0.001
+* The econ factor score is predicted to increase (become more liberal) 0.0001239 (the largest effect) for each one unit increase in population density (coefficient beta)
+* When the predicted population density line is at 0, the predicted factor score is at 0.492 (big jump from moderate republicans)
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.000679, so it is significant at p<0.001
 

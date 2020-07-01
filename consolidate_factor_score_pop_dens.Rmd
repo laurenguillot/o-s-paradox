@@ -79,37 +79,74 @@ econ2016$V161270 <- remove_attributes(econ2016$V161270, "format.spss")
 
 # recode demographic variables for analysis
 econ2016 <- econ2016 %>%
-  mutate(age18_24 = ifelse(V161267x %in% 1:2, 1, 0 #age group 18-20 + 21-24 = 18-24
+  mutate(agegroup = recode(V161267x,
+                           `1` = 0, 
+                           `2` = 0, 
+                           `3` = 1, 
+                           `4` = 1,
+                           `5` = 2, 
+                           `6` = 2, 
+                           `7` = 3,
+                           `8` = 3, 
+                           `9` = 4, 
+                           `10` = 4, 
+                           `11` = 5,
+                           `12` = 5, 
+                           `13` = 6 
                            )) %>%
-  mutate(age25_34 = ifelse(V161267x %in% 3:4, 1, 0 #age group 25-29 + 30-34 = 25-34
-                           )) %>%
-  mutate(age35_44 = ifelse(V161267x %in% 5:6, 1, 0 #age group 35-39 + 40-44 = 35-44
-                           )) %>%
-  mutate(age45_54 = ifelse(V161267x %in% 7:8, 1, 0 #age group 45-49 + 50-54 = 45-54
-                           )) %>%
-  mutate(age55_64 = ifelse(V161267x %in% 9:10, 1, 0 #age group 55-59 + 60-64 = 55-64
-                           )) %>%
-  mutate(age65_74 = ifelse(V161267x %in% 11:12, 1, 0 #age group 65-69 + 70-74 = 65-74
-                           )) %>%
-  mutate(age75 = ifelse(V161267x == 6, 1, 0 #age group 75 or older
-                           )) %>%
-  mutate(lessdiploma = ifelse(V161270 %in% 1:8, 1, 0 #less than 1st, 2-4, 5-6, 7-8, 9, 10, 11, 12 no diploma = less than high school diploma
-                            )) %>%
-  mutate(hsdiploma = ifelse(V161270 == 9, 1, 0 #high school graduate (diploma or equivalent)
-                            )) %>%
-  mutate(somecoll = ifelse(V161270 == 10, 1, 0 #some college but no degree
-                           )) %>%
-  mutate(associate = ifelse(V161270 %in% 11:12, 1, 0 #Associate degree occupational/vocational/academic
-                            )) %>%
-  mutate(bachelors = ifelse(V161270 == 13, 1, 0 #Bachelor's degree
-                            )) %>%
-  mutate(grad = ifelse(V161270 %in% 14:16, 1, 0 #Master's, Professional, Doctorate
+  mutate(highested = recode(V161270,
+                            `1` = 0,
+                            `2` = 0,
+                            `3` = 0, 
+                            `4` = 0, 
+                            `5` = 0, 
+                            `6` = 0, 
+                            `7` = 0, 
+                            `8` = 0,
+                            `9` = 1, 
+                            `90` = 1,
+                            `10` = 2,
+                            `11` = 3,
+                            `12` = 3,
+                            `13` = 4,
+                            `14` = 5,
+                            `15` = 5,
+                            `16` = 5
                             ))
+
+
+#econ2016 <- econ2016 %>%
+#  mutate(age18_24 = ifelse(V161267x %in% 1:2, 1, 0 #age group 18-20 + 21-24 = 18-24
+#                           )) %>%
+#  mutate(age25_34 = ifelse(V161267x %in% 3:4, 1, 0 #age group 25-29 + 30-34 = 25-34
+#                           )) %>%
+#  mutate(age35_44 = ifelse(V161267x %in% 5:6, 1, 0 #age group 35-39 + 40-44 = 35-44
+#                           )) %>%
+#  mutate(age45_54 = ifelse(V161267x %in% 7:8, 1, 0 #age group 45-49 + 50-54 = 45-54
+#                           )) %>%
+#  mutate(age55_64 = ifelse(V161267x %in% 9:10, 1, 0 #age group 55-59 + 60-64 = 55-64
+#                           )) %>%
+#  mutate(age65_74 = ifelse(V161267x %in% 11:12, 1, 0 #age group 65-69 + 70-74 = 65-74
+#                           )) %>%
+#  mutate(age75 = ifelse(V161267x == 13, 1, 0 #age group 75 or older
+#                           )) %>%
+#  mutate(lessdiploma = ifelse(V161270 %in% 1:8, 1, 0 #less than 1st, 2-4, 5-6, 7-8, 9, 10, 11, 12 no diploma = less than high school diploma
+#                            )) %>%
+#  mutate(hsdiploma = ifelse(V161270 == 9, 1, 0 #high school graduate (diploma or equivalent)
+#                            )) %>%
+#  mutate(somecoll = ifelse(V161270 == 10, 1, 0 #some college but no degree
+#                           )) %>%
+#  mutate(associate = ifelse(V161270 %in% 11:12, 1, 0 #Associate degree occupational/vocational/academic
+#                            )) %>%
+#  mutate(bachelors = ifelse(V161270 == 13, 1, 0 #Bachelor's degree
+#                            )) %>%
+#  mutate(grad = ifelse(V161270 %in% 14:16, 1, 0 #Master's, Professional, Doctorate
+#                            ))
 
 # remove NA
 econ2016 <- na.omit(econ2016)
 
-# reverse code so high values indicate more liberal issue positions
+# reverse code so high values indicate more liberal issue positions 
 econ2016 <- econ2016 %>%
   mutate(libcon = recode(libcon, #recode so 6 = strong liberal and 0 = strong conservative
                          `0` = 6,
@@ -127,6 +164,16 @@ econ2016 <- econ2016 %>%
                           `5` = 1, 
                           `6` = 0
                           ))  %>%
+  mutate(educ = recode(educ,
+                       `1` = 0,
+                       `2` = 1,
+                       `3` = 2, 
+                       `4` = 3, 
+                       `5` = 4,
+                       `6` = 5, 
+                       `7` = 6,
+                       `8` = 7
+                       )) %>%
   mutate(fedgun = recode(fedgun, #recode so 2 = gun purchase more difficult and 0 = gun purchase more easy
                          `0` = 2,
                          `2` = 0
@@ -179,6 +226,16 @@ econ2016 <- econ2016 %>%
                           `0` = 1
                           ))
   
+# collapse identity into 3 point scales
+
+econ2016 <- econ2016 %>%
+  mutate(libcon3 = ifelse(libcon %in% 0:2, 0,
+                          ifelse(libcon == 3, 1,
+                                 ifelse(libcon %in% 4:6, 2, NA)))) %>%
+  mutate(partyid3 = ifelse(partyid %in% 0:2, 0,
+                           ifelse(partyid == 3, 1,
+                                  ifelse(partyid %in% 4:6, 2, NA))))
+
 #create factor score by dividing each column by the number of questions to give a value between 0 and 1
 econ2016 <- econ2016 %>%
   mutate(govservice1 = govservice / 6) %>%
@@ -222,7 +279,20 @@ range(econ2016$fecon2016)
 
 # select needed variables
 econ2016 <- econ2016 %>%
-  select("caseid", "weight", "stfips", "stabbrev", "congdist", "libcon", "partyid", "educ", "race", "hispanic", "white", "white1", "black", "asian", "natamer", "otherrace", "gender", "fecon2016", "age18_24", "age25_34", "age35_44", "age45_54", "age55_64", "age65_74", "age75", "lessdiploma", "somecoll", "associate", "bachelors", "grad")
+  select("caseid", 
+         "weight", 
+         "stfips", 
+         "stabbrev", 
+         "congdist", 
+         "libcon",
+         "libcon3", 
+         "partyid", 
+         "partyid3",
+         "educ", 
+         "race", 
+         "gender", 
+         "fecon2016", 
+         "agegroup")
 ```
 
 ## Population Density from ArcGIS Hub
@@ -415,7 +485,7 @@ hist(combine2016$bluevote)
 # Group Respondents by Identification
 ```{r}
 # Political ID
-all_lib <- filter(combine2016, libcon == c(6, 5, 4)) # ALL LIBERAL
+all_lib <- filter(combine2016, libcon3 == 2) # ALL LIBERAL
 
 st_lib <- filter(combine2016, libcon == 6) # STRONG LIBERAL
 
@@ -431,10 +501,10 @@ con <- filter(combine2016, libcon == 1) # CONSERVATIVE
 
 st_con <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
 
-all_con <- filter(combine2016, libcon == c(2, 1, 0)) # ALL CONSERVATIVE
+all_con <- filter(combine2016, libcon3 == 0) # ALL CONSERVATIVE
 
 # Party ID
-all_dem <- filter(combine2016, partyid == c(6, 5, 4)) # ALL DEMOCRAT
+all_dem <- filter(combine2016, partyid3 == 2) # ALL DEMOCRAT
 
 st_dem <- filter(combine2016, partyid == 6) # STRONG DEMOCRAT
 
@@ -450,7 +520,7 @@ rep <- filter(combine2016, partyid == 1) # REPUBLICAN
 
 st_rep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
 
-all_rep <- filter(combine2016, partyid == c(0, 1, 2)) # ALL REPUBLICAN
+all_rep <- filter(combine2016, partyid3 == 0) # ALL REPUBLICAN
 ```
 
 ## Look at distribution for each group

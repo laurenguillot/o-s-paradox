@@ -1,0 +1,50 @@
+---
+title: "Regression Outputs"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(gmodels)
+library(survey)
+library(jtools)
+library(huxtable)
+options("jtools-digits" = 8)
+```
+
+
+## Results for Liberals
+```{r}
+export_summs(alllib1, alllib2, alllib3)
+```
+
+## Results for Moderates
+```{r}
+export_summs(modid1, modid2, modid3)
+```
+
+## Results for Conservatives
+```{r}
+export_summs(allcon1, allcon2, allcon3)
+```
+
+=============================================
+
+## Results for Democrats
+```{r}
+export_summs(alldem1, alldem2, alldem3)
+```
+
+## Results for Independents
+```{r}
+export_summs(modparty1, modparty2, modparty3)
+```
+
+## Results for Republicans 
+```{r}
+export_summs(allrep1, allrep2, allrep3)
+```
+

@@ -23,155 +23,217 @@ summary(fit) # show results
 
 Strong Liberal
 ```{r}
-regress3_stlib <- lm(fecon2016 ~ bluevote, data = st_lib)
-summary(regress3_stlib)
+#regress3_stlib <- lm(fecon2016 ~ bluevote, data = st_lib)
+#summary(regress3_stlib)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = stlib_design))
 ```
-* The econ factor score is predicted to increase 0.003396 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 8.692
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.596 (blue vote), so it is not significant
+* The econ factor score is predicted to increase 0.00612886 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 9.24905710
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.35682492 (blue vote), so it is not significant
 
 --------------------------
 
+All Liberal
+```{r}
+alllib3 <- svyglm(formula = fecon2016 ~ bluevote, design = alllib_design)
+summ(alllib3)
+```
+
+
 Liberal
 ```{r}
-regress3_lib <- lm(fecon2016 ~ bluevote, data = st_lib)
-summary(regress3_lib)
+#regress3_lib <- lm(fecon2016 ~ bluevote, data = st_lib)
+#summary(regress3_lib)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = lib_design))
 ```
-* The econ factor score is predicted to increase 0.003396 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 8.692
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.596, so it is not significant
+* The econ factor score is predicted to increase 0.00858240 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 8.89579890
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.14519488, so it is not significant
 
 --------------------------
 
 Moderate Liberal
 ```{r}
-regress3_mlib <- lm(fecon2016 ~ bluevote, data = m_lib)
-summary(regress3_mlib)
+#regress3_mlib <- lm(fecon2016 ~ bluevote, data = m_lib)
+#summary(regress3_mlib)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = mlib_design))
 ```
-* The econ factor score is predicted to increase 0.005353 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 6.637
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.314, so it is not significant
+* The econ factor score is predicted to increase 0.00113310 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.84142058
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.88909985, so it is not significant
 
 --------------------------
 
 Moderate Ideology
 ```{r}
-regress3_modid <- lm(fecon2016 ~ bluevote, data = mod_id)
-summary(regress3_modid)
+#regress3_modid <- lm(fecon2016 ~ bluevote, data = mod_id)
+#summary(regress3_modid)
+
+modid3 <- svyglm(formula = fecon2016 ~ bluevote, design = modid_design)
+
+summ(modid3)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = modid_design))
 ```
-* The econ factor score is predicted to increase 0.021548 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 5.233
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0000013, so it is significant at the p<0.001 level
+* The econ factor score is predicted to increase 0.01147326 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 5.79516547
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.04694668, so it is significant
+
+```{r}
+allcon3 <- svyglm(formula = fecon2016 ~ bluevote, design = allcon_design)
+summ(allcon3)
+```
+
+All Conservative
 
 --------------------------
 
 Moderate Conservative
 ```{r}
-regress3_mcon <- lm(fecon2016 ~ bluevote, data = m_con)
-summary(regress3_mcon)
+#regress3_mcon <- lm(fecon2016 ~ bluevote, data = m_con)
+#summary(regress3_mcon)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = mcon_design))
 ```
-* The econ factor score is predicted to increase 0.017619 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 4.7716
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00294, so it is significant at the p<0.01 level
+* The econ factor score is predicted to increase 0.01060269 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 5.65582619
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.07181948, so it is slightly significant
 
 --------------------------
 
 Conservative
 ```{r}
-regress3_con <- lm(fecon2016 ~ bluevote, data = con)
-summary(regress3_con)
+#regress3_con <- lm(fecon2016 ~ bluevote, data = con)
+#summary(regress3_con)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = con_design))
 ```
-* The econ factor score is predicted to increase 0.020729 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 3.188
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00161, so it is significant at the p<0.01 level
+* The econ factor score is predicted to increase 0.00025167 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 3.84114521
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.97256801, so it is significant at the p<0.01 level
 
 --------------------------
 
 Strong Conservative
 ```{r}
-regress3_stcon <- lm(fecon2016 ~ bluevote, data = st_con)
-summary(regress3_stcon)
+#regress3_stcon <- lm(fecon2016 ~ bluevote, data = st_con)
+#summary(regress3_stcon)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = stcon_design))
 ```
-* The econ factor score is predicted to increase 0.01018 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 3.21798
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.464, so it is not significant
+* The econ factor score is predicted to decrease -0.01078277 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 4.40601602
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.39545149, so it is not significant
 
 ======================================
+All Democrats
+```{r}
+alldem3 <- svyglm(formula = fecon2016 ~ bluevote, design = alldem_design)
+summ(alldem3)
+```
+
+
 
 Strong Democrat
 ```{r}
-regress3_stdem <- lm(fecon2016 ~ bluevote, data = st_dem)
-summary(regress3_stdem)
+#regress3_stdem <- lm(fecon2016 ~ bluevote, data = st_dem)
+#summary(regress3_stdem)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = stdem_design))
 ```
-* The econ factor score is predicted to increase 0.008042 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 7.426
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0182 (blue vote), so it is significant at the p<0.05
+* The econ factor score is predicted to increase 0.00766531 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 8.17704135
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.13034270 (blue vote), so it is slightly significant
 
 --------------------------
 
 Democrat
 ```{r}
-regress3_dem <- lm(fecon2016 ~ bluevote, data = dem)
-summary(regress3_dem)
+#regress3_dem <- lm(fecon2016 ~ bluevote, data = dem)
+#summary(regress3_dem)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = dem_design))
 ```
-* The econ factor score is predicted to increase 0.011146 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 6.268
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0438, so it is significant at the p<0.05
+* The econ factor score is predicted to increase 0.00623350 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.00105875
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.33421391, so it is not significant
 
 --------------------------
 
 Moderate Democrat
 ```{r}
-regress3_mdem <- lm(fecon2016 ~ bluevote, data = m_dem)
-summary(regress3_mdem)
+#regress3_mdem <- lm(fecon2016 ~ bluevote, data = m_dem)
+#summary(regress3_mdem)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = mdem_design))
 ```
-* The econ factor score is predicted to increase 0.015752 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 6.415986
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00574, so it is significant at the p<0.01
+* The econ factor score is predicted to increase 0.01508348 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 6.29694009
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.02639755, so it is significant at the p<0.05
 
 --------------------------
 
 Moderate Party
 ```{r}
-regress3_modparty <- lm(fecon2016 ~ bluevote, data = mod_party)
-summary(regress3_modparty)
+#regress3_modparty <- lm(fecon2016 ~ bluevote, data = mod_party)
+#summary(regress3_modparty)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = modparty_design))
+
+modparty3 <- svyglm(formula = fecon2016 ~ bluevote, design = modparty_design)
+summ(modparty3)
 ```
-* The econ factor score is predicted to increase 0.007167 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 5.852476
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.363, so it is not significant
+* The econ factor score is predicted to decrease -0.00199321 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 5.65275854
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.78384499, so it is not significant
 
 --------------------------
+All Republican
+```{r}
+allrep3 <- svyglm(formula = fecon2016 ~ bluevote, design = allrep_design)
+summ(allrep3)
+```
+
 
 Moderate Republican
 ```{r}
-regress3_mrep <- lm(fecon2016 ~ bluevote, data = m_rep)
-summary(regress3_mrep)
+#regress3_mrep <- lm(fecon2016 ~ bluevote, data = m_rep)
+#summary(regress3_mrep)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = mrep_design))
 ```
-* The econ factor score is predicted to increase 0.00007608 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 4.731
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.993, so it is not significant
+* The econ factor score is predicted to decrease -0.00949184 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 5.95250699
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.37640274, so it is not significant
 
 --------------------------
 
 Republican
 ```{r}
-regress3_rep <- lm(fecon2016 ~ bluevote, data = rep)
-summary(regress3_rep)
+#regress3_rep <- lm(fecon2016 ~ bluevote, data = rep)
+#summary(regress3_rep)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = rep_design))
 ```
-* The econ factor score is predicted to increase 0.022088 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 3.860807
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00274, so it is significant at the p<0.01
+* The econ factor score is predicted to increase 0.02364000 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 4.11062381
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.00553721, so it is significant at the p<0.01
 
 --------------------------
 
 Strong Republican
 ```{r}
-regress3_strep <- lm(fecon2016 ~ bluevote, data = st_rep)
-summary(regress3_strep)
+#regress3_strep <- lm(fecon2016 ~ bluevote, data = st_rep)
+#summary(regress3_strep)
+
+summ(svyglm(formula = fecon2016 ~ bluevote + factor(race) + gender + factor(educ), design = strep_design))
 ```
-* The econ factor score is predicted to increase 0.015945 for each one unit increase in district blue vote
-* When the predicted population density line is at 0, the factor score is at 3.45
-* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.0124, so it is significant at the p<0.05
+* The econ factor score is predicted to increase 0.00919940 for each one unit increase in district blue vote
+* When the predicted population density line is at 0, the factor score is at 0.08602707
+* The coefficient for the econ factor score has a P-value (Pr(>|t|)) = 0.25025018, so it is not significant
 
 
 
