@@ -1,0 +1,67 @@
+---
+title: "Regression Graphs"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(haven)
+library(gmodels)
+library(ggplot2)
+library(survey)
+library(jtools)
+library(huxtable)
+options("jtools-digits" = 8)
+```
+
+## Regression equation
+y = (coefficient)x + (intercept)
+
+
+
+
+## Graph Model 1 Ideology
+Liberal: y = (0.00001612)x + 7.58804290
+Moderate: y = (0.00004917)x + 6.18383581
+Conservative: y = (0.00012780)x + 4.70426985
+```{r}
+id_m1 <- rbind(all_lib, mod_id, all_con)
+id_eq1=function(x){coef(alllib1)[2]*x+coef(alllib1)[1]}
+id_eq2=function(x){coef(modid1)[2]*x+coef(modid1)[1]}
+id_eq3=function(x){coef(allcon1)[2]*x+coef(allcon1)[1]}
+
+ggplot(id_m1,aes(y=fecon2016,x=POPDENS_CY))+
+  geom_point(size = 1, stroke = 0, shape = 16, alpha = 0.3)+
+  stat_function(fun=id_eq1,geom="line",aes(color="Liberal"))+
+  stat_function(fun=id_eq2,geom="line",aes(color="Moderate"))+
+  stat_function(fun=id_eq3, geom="line",aes(color="Conservative")) +
+  scale_color_manual(values = c("red", "blue", "orange")) +
+  labs(x = "Population Density",
+       y = "Issue Positions",
+       color = "Ideological ID") +
+  ylim(0, 10)
+
+
+# highest pop dens for conservatives is 4,8424  
+```
+
+## Graph Model 1 Party
+```{r}
+party_m1 <- rbind(all_dem, mod_party, all_rep)
+party_eq1=function(x){coef(alldem1)[2]*x+coef(alldem1)[1]}
+party_eq2=function(x){coef(modparty1)[2]*x+coef(modparty1)[1]}
+party_eq3=function(x){coef(allrep1)[2]*x+coef(allrep1)[1]}
+
+ggplot(party_m1,aes(y=fecon2016,x=POPDENS_CY))+
+  geom_point(size = 1, stroke = 0, shape = 16, alpha = 0.3)+
+  stat_function(fun=party_eq1,geom="line",aes(color="Democrat"))+
+  stat_function(fun=party_eq2,geom="line",aes(color="Independent"))+
+  stat_function(fun=party_eq3, geom="line",aes(color="Republican"))+
+  scale_color_manual(values = c("blue", "orange", "red")) +
+  labs(x = "Population Density",
+       y = "Issue Positions",
+       color = "Party ID")
+```
+

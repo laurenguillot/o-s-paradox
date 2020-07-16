@@ -19,6 +19,8 @@ options("jtools-digits" = 8)
 ## Results for Liberals
 ```{r}
 export_summs(alllib1, alllib2, alllib3)
+
+effect_plot(alllib1, pred = POPDENS_CY, interval = TRUE, plot.points = TRUE)
 ```
 
 ## Results for Moderates
