@@ -1,0 +1,740 @@
+---
+title: "all_final"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(haven)
+library(labelled)
+library(gmodels)
+library(ggplot2)
+library(survey)
+library(jtools)
+library(car)
+library(interactions)
+library(ggstance)
+options("jtools-digits" = 8)
+```
+
+# Inport and Tidy ANES data
+
+```{r}
+anes2016all <- read_dta("anes2016.dta")
+
+# select needed economic variables
+econ2016 <- anes2016all %>%
+  select(c(
+    caseid,
+    V160101, # Pre election weight, full sample
+    V160102, # Post election weight, full sample
+    stfips, # STATE FIPS CODE
+    stabbrev, # STATE ABBREVIATION
+    congdist, # CONGRESSIONAL DISTRICT NUMBER
+    ahowlong, # how long at current address 1 = 0-1 years ... 9 = 30+ years
+    libcon, # POLITICAL ID (FORCED): 6 = STRONG CONSERVATIVE ... 0 = STRONG LIBERAL
+    partyid, # PARTISAN ID: 6 = STRONG REP ... 0 = STRONG DEM
+    age, # RESPONDENT AGE IN YEARS
+    V161267x, # PRE: SUMMARY - RESPONDENT AGE GROUP
+    V161270, # PRE: HIGHEST LEVEL OF EDUCATION
+    race, # 1 = WHITE, 2 = BLACK, 3 = ASIAN, 4 = NATIVE, 5 = HISPANIC, 6 = OTHER
+    gender, # 1 = R IS A WOMAN, 0 = MAN
+    govservice, # GOV SERVICES SCALE: 6 = GOV SHOULD PROVIDE MORE SERVICES
+    medinsur, # MEDICAL INSURANCE SCALE: 6 = GOV INSUANCE ... 0 = PRIVATE INSURANCE
+    fedgun, # 2 = GUN PURCHASE EASIER, 1 = THE SAME, 0 = GUN PURCHASE MORE DIFFICULT
+    govjob, # GOV JOB SCALE: 6 = GOV GUARANTEES JOBS ... 0 = GET JOBS ON OWN
+    govblacks, # AID TO BLACKS SCALE: 6 = GOV SHOULD HELP BLACKS ... 0 = BLACKS HELP SELVES
+    ssocsec, # 1 = INCREASED SPENDING ON SOCSEC, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sschools, # 1 = INCREASED SPENDING ON SCHOOLS, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    sscience, # 1 = INCREASED SPENDING ON SCIENCE, 0 = KEEP SAME, -1 DECREASED SPENDING
+    swelfare, # 1 = INCREASED SPENDING ON WELFARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    schildcare, # 1 = INCREASED SPEND ON CHILD CARE, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    spoor, # 1 = INCREASED SPEND ON POOR, 0 = KEEP SAME, -1 = DECREASED SPENDING
+    senviron, # 1 = INCREASED SPEND ON ENVIRONMENT, 0 = KEEP SAME, -1 = DECREASED,
+    gwaction, # 6 = GOV SHOULD BE DOING GREAT DEAL MORE FOR GLOBAL WARMING ... 0 = LESS
+    govinequality, # 2 = R SUPPORT GOV EFFORTS TO REDUCE INEQUALITY, 1 = NEUTRAL, 0 = OPPOSE
+    shealthcare7, # 6 = SUPPORT STRONG INCREASE IN HEALTH CARE SPEND, 0 = STRONG DECREASE
+    taxmillion, # 2 = SUPPORTS INCREASING TAXES ON MILLIONAIRES, 1 = NEUTRAL, 0 = OPPOSE
+    govprob, # 1 = gov doing too much, 0 = problems are bigger
+    fmarket, # 1 = FREE MARKET CAN HANDLE PROBLEMS, 0 = GOV NEEDED TO SOLVE PROBLEMS
+    govless, # 1 = LESS GOV THE BETTER, 0 = GOV SHOULD DO MORE THINGS
+    gregbus, # 4 = A GREAT DEAL OF REGULATION IS GOOD FOR SOCIETY ... 0 = NONE AT ALL
+    emorechance, # It is big problem if some have more chances than others (4 = strongly agree)
+    eworry, # USA would be better off if we worried less about equality (4 = strongly agree)
+    eequalopp, # Our society should do all possible for equal opportunity (4 = strongly agree)
+    efair, # If people treated more equal USA would have fewer problems (4 = strongly agree)
+    madjust, # We should adjust morality to changing world (4 = strongly agree)
+    mbreakdown, # Newer lifestyles contributing to breakdown of society (4 = strongly agree)
+    mtolerant, # We should be tolerant of those with different morality (4 = strongly agree)
+    mtraditional, # Country better with emphasis on traditional family ties (4 = strongly agree)
+    glservice, # 5 = require service for gay couples ... 0 = refuse service
+    transbath, # 5 = trans use bathroom of choice ... 0 = use bathroom of gender born with
+    gaydiscrim, # 3 = strongly favor antidiscrimination laws for gays ... 0 = strongly oppose
+    equalpay, # 6 =  R strongly supports equal pay for equal work; . . . ; 0 = strongly oppose
+    freethink # = R strongly agrees USA needs more free thinks; . . . ; 0 = strongly disagrees
+  ))
+
+
+# combine weights
+econ2016 <- econ2016 %>%
+  mutate(weight = ifelse(V160101 == 0, V160102, V160101))
+
+# remove haven labeling from relevant variables
+econ2016$V161267x <- remove_attributes(econ2016$V161267x, "format.spss")
+econ2016$V161270 <- remove_attributes(econ2016$V161270, "format.spss")
+
+econ2016$V161267x <- as.numeric(econ2016$V161267x)
+econ2016$V161270 <- as.numeric(econ2016$V161270)
+
+# recode demographic variables for analysis
+econ2016 <- econ2016 %>%
+  transform(age2 = age^2) %>%
+  mutate(agegroup = recode(V161267x,
+                           `1` = 0, # age group 18-20 -> 18-24
+                           `2` = 0, # age group 21-24 -> 18-24
+                           `3` = 1, # age group 25-29 -> 25-34
+                           `4` = 1, # age group 30-34 -> 25-34
+                           `5` = 2, # age group 35-39 -> 35-44
+                           `6` = 2, # age group 40-44 -> 35-44
+                           `7` = 3, # age group 45-49 -> 45-54
+                           `8` = 3, # age group 50-54 -> 45-54
+                           `9` = 4, # age group 55-59 -> 55-64
+                           `10` = 4, # age group 60-64 -> 55-64
+                           `11` = 5, # age group 65-69 -> 65-74
+                           `12` = 5, # age group 70-74 -> 65-74
+                           `13` = 6 # age group 75 or older
+                           )) %>%
+  mutate(highested = recode(V161270,
+                            `1` = 0, # education less than 1st -> no high school diploma
+                            `2` = 0, # education 1-4th grade -> no high school diploma
+                            `3` = 0, # education 5-6th grade -> no high school diploma
+                            `4` = 0, # education 7-8th grade -> no high school diploma
+                            `5` = 0, # 9th grade -> no high school diploma
+                            `6` = 0, # 10th grade -> no high school diploma
+                            `7` = 0, # 11th grade -> no high school diploma
+                            `8` = 0, # 12th grade no diploma -> no high school diploma
+                            `9` = 1, # high school diploma or equivalent
+                            `90` = 1, # other given as high school graduate -> hs diploma 
+                            `10` = 2, # some college but no digree
+                            `11` = 3, # associate degree 
+                            `12` = 3, # associate degree
+                            `13` = 4, # Bachelors degree
+                            `14` = 5, # Master's degree
+                            `15` = 6, # professional degree -> doctorate or professional degree
+                            `16` = 6 # doctorate degree -> doctorate or professional degree
+                            )) %>%
+  mutate(race = recode(race, 
+                       `1` = 0, # white
+                       `2` = 1, # black
+                       `3` = 2, # asian
+                       `4` = 3, # native american
+                       `5` = 4, # hispanic,
+                       `6` = 5 # other
+                       ))
+
+econ2016 <- econ2016 %>%
+#  filter(agegroup >= 0) %>%
+  filter(highested >= 0)
+
+# remove NA
+ econ2016 <- na.omit(econ2016)
+
+# reverse code so high values indicate more liberal issue positions 
+econ2016 <- econ2016 %>%
+  mutate(libcon = recode(libcon, #recode so 6 = strong liberal and 0 = strong conservative
+                         `0` = 6,
+                         `1` = 5,
+                         `2` = 4, 
+                         `4` = 2,
+                         `5` = 1, 
+                         `6` = 0
+                          )) %>%
+  mutate(partyid = recode(partyid, #recode so 6 = strong Democrat and 0 = strong Republican
+                          `0` = 6,
+                          `1` = 5,
+                          `2` = 4, 
+                          `4` = 2,
+                          `5` = 1, 
+                          `6` = 0
+                          ))  %>%
+  mutate(fedgun = recode(fedgun, #recode -> 2 = gun purchase more difficult and 0 = gun purchase more easy
+                         `0` = 2,
+                         `2` = 0
+                          )) %>%
+  mutate(ssocsec = recode(ssocsec, #recode so 2 = more spending, 1 = stay the same, 0 = decrease spending
+                          `1` = 2,
+                          `0` = 1,
+                          `-1` = 0
+                          )) %>%
+  mutate(sschools = recode(sschools, #recode so 2 = increased spending, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(sscience = recode(sscience, #recode 2 = increased spend, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(swelfare = recode(swelfare, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(schildcare = recode(schildcare, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(spoor = recode(spoor, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(senviron = recode(senviron, #reverse code 2 = increased spend, 1 = stay the same, 0 = decrease
+                           `1` = 2,
+                           `0` = 1,
+                           `-1` = 0
+                           )) %>%
+  mutate(govprob = recode(govprob,
+                          `1` = 0,
+                          `0` = 1
+                          )) %>%
+  mutate(fmarket = recode(fmarket, #reverse code 1 = gov needed to solve problems, 0 = free market can handle
+                          `1` = 0,
+                          `0` = 1
+                          )) %>%
+  mutate(govless = recode(govless, #reverse code 1 = gov should do more things, 0 = less gov the better
+                          `1` = 0,
+                          `0` = 1
+                          ))
+    
+
+#create factor score by dividing each column by the number of questions to give a value between 0 and 1
+econ2016 <- econ2016 %>%
+  mutate(govservice1 = govservice / 6) %>%
+  mutate(medinsur1 = medinsur / 6) %>%
+  mutate(fedgun1 = fedgun / 2) %>%
+  mutate(govjob1 = govjob / 6) %>%
+  mutate(govblacks1 = govblacks / 6) %>%
+  mutate(ssocsec1 = ssocsec / 2) %>%
+  mutate(sschools1 = sschools / 2) %>%
+  mutate(sscience1 = sscience / 2) %>%
+  mutate(swelfare1 = swelfare / 2) %>%
+  mutate(schildcare1 = schildcare / 2) %>%
+  mutate(spoor1 = spoor / 2) %>%
+  mutate(senviron1 = senviron / 2) %>%
+  mutate(gwaction1 = gwaction / 6) %>%
+  mutate(govinequality1 = govinequality / 2) %>%
+  mutate(shealthcare71 = shealthcare7 / 6) %>%
+  mutate(taxmillion1 = taxmillion / 2) %>%
+  mutate(govprob1 = govprob / 1) %>%
+  mutate(fmarket1 = fmarket / 1) %>%
+  mutate(govless1 = govless / 1) %>%
+  mutate(gregbus1 = gregbus / 4)
+
+
+#add all together to create single factor score for economic dimension
+ econ2016 <- econ2016 %>%
+  dplyr::mutate(fecon20 = 
+           govservice1 + 
+           medinsur1 +
+           fedgun1 +
+           govjob1 + 
+           govblacks1 + 
+           ssocsec1 +
+           sschools1 +
+           sscience1 +
+           swelfare1 +
+           schildcare1 +
+           spoor1 +
+           senviron1 +
+           gwaction1 +
+           govinequality1 +
+           shealthcare71 +
+           taxmillion1 +
+           govprob +
+           fmarket1 +
+           govless1 +
+           gregbus1
+           ) %>%
+     dplyr::mutate(fecon10 = 
+           govservice1 + 
+           medinsur1 +
+           govjob1 + 
+           ssocsec1 +
+           sschools1 +
+           sscience1 +
+           swelfare1 +
+           schildcare1 +
+           spoor1 +
+           senviron1
+           )
+
+# check range of factor score to be 0 (most conservative) to 20 (most liberal)
+range(econ2016$fecon10)
+range(econ2016$fecon20)
+
+# select needed variables
+econ2016 <- econ2016 %>%
+  select("caseid", 
+         "weight", 
+         "stfips", 
+         "stabbrev", 
+         "congdist",
+         "libcon",
+         "partyid",
+         "ahowlong",
+         "age",
+         "age2",
+         "agegroup",
+         "highested", 
+         "race", 
+         "gender", 
+         "fecon20",
+         "fecon10",
+         "emorechance", 
+         "eequalopp",
+         "mtolerant",
+         "mtraditional",
+         )
+```
+
+# Import and Tidy Population Density Data from ArcGIS Hub
+[Source](https://hub.arcgis.com/datasets/ff48bbae433442a38f6c635b8c7baf72_0/data?geometry=11.844%2C-0.129%2C102.899%2C76.650)
+```{r}
+# create data frame
+geo2016 <- X2016_Population_Density_by_Congressional_District %>%
+  select(c(
+    OBJECTID,
+    ID,
+    NAME, # NAME OF THE CONGRESSIONAL DISTRICT
+    ST_ABBREV,
+    TOTPOP_CY, # TOTAL POPULATION OF DISTRICT IN 2016
+    POPDENS_CY, # POPULATION DENSITY OF DISTRICT IN 2016
+    POPGRW10CY # POPULATION GROWTH RATE 2010 - 2016
+  ))
+
+# remove alphabetic characters to give only district number
+geo2016$NAME <- gsub("[a-zA-Z ]", "", geo2016$NAME)
+
+# remove dash in district number
+geo2016$NAME <- gsub("\\-", "", geo2016$NAME)
+
+# make district number vector numeric
+ geo2016$NAME <- as.double(geo2016$NAME)
+
+# add leading zeros to district number
+geo2016$NAME <- sprintf("%02d", geo2016$NAME)
+
+# turn ST_ABBREV into a character variable
+geo2016$ST_ABBREV <- as.character(geo2016$ST_ABBREV)
+
+# combine ST_ABBREV and NAME to form CD (consistent with other data set)
+geo2016 <- geo2016 %>%
+  unite(col = "CD", ST_ABBREV:NAME, sep = "-")
+
+# make CD a character variable
+geo2016$CD <- as.character(geo2016$CD)
+
+# turn POPDENS_CY into a numeric
+geo2016$POPDENS_CY <- as.numeric(geo2016$POPDENS_CY)
+```
+
+# Import and Tidy Election Data from the Daily Kos
+* since arguing it is about geographic location, use local election results to determine the red/blue culture of the area - need to find justification
+* used data on election results for congressional districts used in 2016 election because that is the year of the ANES data
+* make dummy variable -- 1 means majority voted blue 
+* also make a dummy variable for presidential vote
+
+**NEED TO MAKE BETTER PRES_BLUEVOTE CALCULATION -- FIGURE OUT HOW TO MUTATE SO IF CLINTON > TRUMP, THEN 1**
+
+```{r}
+dailykos_pres <- read_csv("Daily Kos Elections 2008, 2012 & 2016 presidential election results for congressional districts used in 2016 elections - Results.csv", 
+                     skip = 1)
+
+# make variable for % Clinton vote into blue vote
+
+election <- dailykos %>%
+  mutate(pres_bluevote = ifelse(Clinton >= 50, 1, 0)) %>%
+  mutate(local_bluevote = ifelse(Party == "(D)", 1, 0))
+
+# select needed variables
+election <- election %>%
+  select("CD", "pres_bluevote", "local_bluevote", "Clinton")
+```
+
+# Combine Data Sets
+
+## Daily Kos + ArcGIS
+```{r}
+# combine data sets using CD variable -- same format
+combine2016 <- merge(geo2016, election, by = c("CD"))
+```
+
+## Add ANES data
+```{r}
+# alter formatting of CD variable to be like ANES
+combine2016 <- combine2016 %>%
+  separate("CD", (c("stabbrev", "congdist0")), sep = "-")
+
+# add leading 0 into ANES
+econ2016$congdist0 <- str_pad(econ2016$congdist, width = 2, side = "left", pad = "0")
+
+# combine two data sets
+combine2016 <- merge(econ2016, combine2016, by = c("stabbrev", "congdist0"))
+```
+
+# Descriptive Statistics of Respondents
+```{r}
+combine2016 %>%
+  group_by(factor(partyid)) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(libcon) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(race) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(gender) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(agegroup) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(highested) %>%
+  dplyr::summarise(n = n()) %>%
+  mutate(freq = n / sum(n))
+
+combine2016 %>%
+  group_by(partyid) %>%
+  dplyr::summarise(n = n(), mean = mean(fecon10), sd = sd(fecon10))
+
+combine2016 %>%
+  group_by(libcon) %>%
+  dplyr::summarise(n = n(), mean = mean(fecon10), sd = sd(fecon10))
+```
+
+# Distribution of Operational Ideology
+```{r}
+ggplot(combine2016, aes(x = fecon10, color = factor(partyid))) +
+  geom_density() +
+  scale_x_continuous(name = 'Econ Preferences') +
+  scale_color_discrete(name = 'Party ID', labels = c("Strong Republican", "Republican", "Lean Republican", "Independent", "Lean Democrat", "Democrat", "Strong Democrat"))
+
+ggplot(combine2016, aes(x = fecon10, color = factor(libcon))) +
+  geom_density() +
+  scale_x_continuous(name = 'Econ Preferences') +
+  scale_color_discrete(name = 'Ideological ID', labels = c("Extremely Conservative", "Conservative", "Moderate Conservative", "Moderate", "Moderate Liberal", "Liberal", "Extremely Liberal"))
+```
+
+
+# Make separate data sets for each identity
+
+```{r}
+# Ideological Identity
+st_lib <- filter(combine2016, libcon == 6) # STRONG LIBERAL
+
+lib <- filter(combine2016, libcon == 5) # LIBERAL
+
+m_lib <- filter(combine2016, libcon == 4) # MODERATE LIBERAL
+
+mod <- filter(combine2016, libcon == 3) # MODERATE
+
+m_con <- filter(combine2016, libcon == 2) # MODERATE CONSERVATIVE
+
+con <- filter(combine2016, libcon == 1) # CONSERVATIVE
+
+st_con <- filter(combine2016, libcon == 0) # STRONG CONSERVATIVE
+
+# Party ID
+st_dem <- filter(combine2016, partyid == 6) # STRONG DEMOCRAT
+
+dem <- filter(combine2016, partyid == 5) # DEMOCRAT
+
+m_dem <- filter(combine2016, partyid == 4) # MODERATE DEMOCRAT
+
+ind <- filter(combine2016, partyid == 3) # MODERATE
+
+m_rep <- filter(combine2016, partyid == 2) # MODERATE REPUBLICAN
+
+rep <- filter(combine2016, partyid == 1) # REPUBLICAN
+
+st_rep <- filter(combine2016, partyid == 0) # STRONG REPUBLICAN
+```
+
+# Regressions
+
+## Overall-Party ID
+```{r}
+overall_design <- svydesign(ids = ~1, weights = ~weight, data = combine2016)
+
+overall.party_regress <- svyglm(formula = fecon10 ~ partyid, design = overall_design)
+summ(overall.party_regress,
+     center = TRUE)
+
+stats:::anova.glm(overall.party_regress, test = "F")
+
+overall.party_regress2 <- svyglm(formula = fecon10 ~ POPDENS_CY, design = overall_design)
+summ(overall.party_regress2, 
+     center = TRUE)
+
+stats:::anova.glm(overall.party_regress2, test = "F")
+
+overall.party_regress3 <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                                 design = overall_design)
+summ(overall.party_regress3,
+     center = TRUE)
+
+stats:::anova.glm(overall.party_regress3, test = "F")
+
+sim_slopes(overall.party_regress3, 
+                                pred = POPDENS_CY, 
+                                modx = partyid, 
+                                modx.values = c(0, 1, 2, 3, 4, 5, 6), 
+                                centered = "all", 
+                                data = combine2016)
+```
+
+## Strong Democrat
+```{r}
+stdem_design <- svydesign(ids = ~1, weights = ~weight, data = st_dem)
+
+stdem_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                        design = stdem_design)
+summ(stdem_regress,
+     center = TRUE)
+```
+
+## Democrat
+```{r} 
+dem_design <- svydesign(ids = ~1, weights = ~weight, data = dem)
+
+dem_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                      design = dem_design)
+summ(dem_regress,
+     center = TRUE)
+```
+
+## Idependent-Democrat
+```{r}
+ind.dem_design <- svydesign(ids = ~1, weights = ~weight, data = m_dem)
+
+ind.dem_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                          design = ind.dem_design)
+summ(ind.dem_regress,
+     center = TRUE)
+```
+
+## Independent
+```{r}
+ind_design <- svydesign(ids = ~1, weights = ~weight, data = ind)
+
+ind_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                      design = ind_design)
+summ(ind_regress,
+     center = TRUE)
+```
+
+## Independent-Republican
+```{r}
+ind.rep_design <- svydesign(ids = ~1, weights = ~weight, data = m_rep)
+
+ind.rep_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                          design = ind.rep_design)
+summ(ind.rep_regress,
+     center = TRUE)
+```
+
+## Republican
+```{r}
+rep_design <- svydesign(ids = ~1, weights = ~weight, data = rep)
+
+rep_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                      design = rep_design)
+summ(rep_regress,
+     center = TRUE)
+```
+
+## Strong Republican
+```{r}
+strep_design <- svydesign(ids = ~1, weights = ~weight, data = st_rep)
+
+strep_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * partyid, 
+                        design = strep_design)
+summ(strep_regress,
+     center = TRUE)
+```
+
+## Linear trend lines
+```{r}
+party_eq1=function(x){coef(stdem_regress)[2]*x+coef(stdem_regress)[1]}
+party_eq2=function(x){coef(dem_regress)[2]*x+coef(dem_regress)[1]}
+party_eq3=function(x){coef(ind.dem_regress)[2]*x+coef(ind.dem_regress)[1]}
+party_eq4=function(x){coef(ind_regress)[2]*x+coef(ind_regress)[1]}
+party_eq5=function(x){coef(ind.rep_regress)[2]*x+coef(ind.rep_regress)[1]}
+party_eq6=function(x){coef(rep_regress)[2]*x+coef(rep_regress)[1]}
+party_eq7=function(x){coef(strep_regress)[2]*x+coef(strep_regress)[1]}
+
+ggplot(combine2016, aes(y = fecon10, x = POPDENS_CY, color = factor(partyid)))+
+  geom_point(size = 2, stroke = 0, shape = 16, alpha = 0.7) +
+  stat_function(fun = party_eq1, geom="line", color = scales::hue_pal()(7)[1], aes(color = "Strong Democrat")) +
+  stat_function(fun = party_eq2, geom="line", color = scales::hue_pal()(7)[2], aes(color = "Democrat")) +
+  stat_function(fun = party_eq3, geom="line", color = scales::hue_pal()(7)[3], aes(color = "Lean Democrat")) +
+  stat_function(fun = party_eq4, geom = "line", color = scales::hue_pal()(7)[4], aes(color = "Independent")) +
+  stat_function(fun = party_eq5, geom = "line", color = scales::hue_pal()(7)[5], aes(color = "Lean Republican")) +
+  stat_function(fun = party_eq6, geom = "line", color = scales::hue_pal()(7)[6], aes(color = "Republican")) +
+  stat_function(fun = party_eq7, geom = "line", color = scales::hue_pal()(7)[7], aes(color = "Strong Republican")) +
+  scale_color_discrete(labels = c("Strong Democrat", "Democrat", "Lean Democrat", "Independent", "Lean Republican", "Republican", "Strong Republican")) +
+  labs(x = "Population Density",
+       y = "Issue Positions",
+       color = "Party ID") +
+  ylim(0, 10)
+```
+
+-------------------------------------------------------
+## Overall-Ideological ID
+```{r}
+overall_design <- svydesign(ids = ~1, weights = ~weight, data = combine2016)
+
+overall.id_regress <- svyglm(formula = fecon10 ~ libcon, design = overall_design)
+summ(overall.id_regress,
+     center = TRUE)
+
+stats:::anova.glm(overall.id_regress, test = "F")
+
+overall.id_regress2 <- svyglm(formula = fecon10 ~ POPDENS_CY, design = overall_design)
+summ(overall.id_regress2, 
+     center = TRUE)
+
+stats:::anova.glm(overall.id_regress2, test = "F")
+
+overall.id_regress3 <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                              design = overall_design)
+summ(overall.id_regress3,
+     center = TRUE)
+
+stats:::anova.glm(overall.id_regress3, test = "F")
+
+sim_slopes(overall.id_regress3, 
+           pred = POPDENS_CY, 
+           modx = libcon, 
+           modx.values = c(0, 1, 2, 3, 4, 5, 6),
+           centered = "all", 
+           data = combine2016)
+
+```
+
+## Strong Liberal
+```{r}
+stlib_design <- svydesign(ids = ~1, weights = ~weight, data = st_lib)
+
+stlib_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = stlib_design)
+summ(stlib_regress,
+     center = TRUE)
+```
+
+## Liberal
+```{r}
+lib_design <- svydesign(ids = ~1, weights = ~weight, data = lib)
+
+lib_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = lib_design)
+summ(lib_regress,
+     center = TRUE)
+```
+
+## Moderate Liberal
+```{r}
+mlib_design <- svydesign(ids = ~1, weights = ~weight, data = m_lib)
+
+mlib_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = mlib_design)
+summ(mlib_regress,
+     center = TRUE)
+```
+
+## Moderate
+```{r}
+mod_design <- svydesign(ids = ~1, weights = ~weight, data = mod)
+
+mod_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = mod_design)
+summ(mod_regress,
+     center = TRUE)
+```
+
+## Moderate Conservative
+```{r}
+mcon_design <- svydesign(ids = ~1, weights = ~weight, data = m_con)
+
+mcon_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = mcon_design)
+summ(mcon_regress,
+     center = TRUE)
+```
+
+## Conservative
+```{r}
+con_design <- svydesign(ids = ~1, weights = ~weight, data = con)
+
+con_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = con_design)
+summ(con_regress,
+     center = TRUE)
+```
+## Strong Conservative
+```{r}
+stcon_design <- svydesign(ids = ~1, weights = ~weight, data = st_con)
+
+stcon_regress <- svyglm(formula = fecon10 ~ POPDENS_CY * libcon, 
+                        design = stcon_design)
+summ(stcon_regress,
+     center = TRUE)
+```
+
+
+# Graph Regression Outputs
+## Ideological Identification
+```{r}
+id_eq1=function(x){coef(stlib_regress)[2]*x+coef(stlib_regress)[1]}
+id_eq2=function(x){coef(lib_regress)[2]*x+coef(lib_regress)[1]}
+id_eq3=function(x){coef(mlib_regress)[2]*x+coef(mlib_regress)[1]}
+id_eq4=function(x){coef(mod_regress)[2]*x+coef(mod_regress)[1]}
+id_eq5=function(x){coef(mcon_regress)[2]*x+coef(mcon_regress)[1]}
+id_eq6=function(x){coef(con_regress)[2]*x+coef(con_regress)[1]}
+id_eq7=function(x){coef(stcon_regress)[2]*x+coef(stcon_regress)[1]}
+
+ggplot(combine2016, aes(y = fecon10, x = POPDENS_CY, color = factor(libcon)))+
+  geom_point(size = 2, stroke = 0, shape = 16, alpha = 0.7) +
+  stat_function(fun = id_eq1, geom="line", color = scales::hue_pal()(7)[1], aes(color = "Extreme Liberal")) +
+  stat_function(fun = id_eq2, geom="line", color = scales::hue_pal()(7)[2], aes(color = "Liberal")) +
+  stat_function(fun = id_eq3, geom="line", color = scales::hue_pal()(7)[3], aes(color = "Moderate Liberal")) +
+  stat_function(fun = id_eq4, geom = "line", color = scales::hue_pal()(7)[4], aes(color = "Moderate")) +
+  stat_function(fun = id_eq5, geom = "line", color = scales::hue_pal()(7)[5], aes(color = "Moderate Conservative")) +
+  stat_function(fun = id_eq6, geom = "line", color = scales::hue_pal()(7)[6], aes(color = "Conservative")) +
+  stat_function(fun = id_eq7, geom = "line", color = scales::hue_pal()(7)[7], aes(color = "Extreme Conservative")) +
+  scale_color_discrete(labels = c("Extreme Liberal", "Liberal", "Moderate Liberal", "Moderate", "Moderate Conservative", "Conservative", "Extreme Conservative")) +
+  labs(x = "Population Density",
+       y = "Issue Positions",
+       color = "Ideological ID") +
+  ylim(0, 10)
+```
+
+
